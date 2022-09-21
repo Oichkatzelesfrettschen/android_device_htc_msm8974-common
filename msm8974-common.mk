@@ -264,6 +264,11 @@ PRODUCT_PACKAGES += \
     libprotobuf-cpp-full-vendorcompat \
     libprotobuf-cpp-lite-vendorcompat
 
+# Radio
+PRODUCT_PACKAGES += \
+    android.hardware.radio.config@1.0-service \
+    android.hardware.radio.config@1.1-service
+
 # RenderScript HAL
 PRODUCT_PACKAGES += \
     android.hardware.renderscript@1.0-impl
