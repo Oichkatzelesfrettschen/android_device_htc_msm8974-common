@@ -270,6 +270,7 @@ PRODUCT_PACKAGES += \
 
 # RIL
 PRODUCT_PACKAGES += \
+    android.hardware.radio.config@1.0 \
     libaudioclient_shim \
     libcnefeatureconfig \
     librmnetctl \
