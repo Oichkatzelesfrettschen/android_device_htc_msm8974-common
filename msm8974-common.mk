@@ -140,8 +140,7 @@ PRODUCT_PACKAGES += \
 # DRM
 PRODUCT_PACKAGES += \
     android.hardware.drm@1.0-impl \
-    android.hardware.drm@1.0-service \
-    android.hardware.drm@1.3-service.clearkey
+    android.hardware.drm@1.0-service
 
 # FM Radio
 PRODUCT_PACKAGES += \
@@ -270,7 +269,6 @@ PRODUCT_PACKAGES += \
 
 # RIL
 PRODUCT_PACKAGES += \
-    android.hardware.radio.config@1.0 \
     libaudioclient_shim \
     libcnefeatureconfig \
     librmnetctl \
@@ -284,10 +282,6 @@ PRODUCT_COPY_FILES += \
 # Sensors
 PRODUCT_PACKAGES += \
     android.hardware.sensors@1.0-impl
-
-# Thermal
-PRODUCT_PACKAGES += \
-    thermanager
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/thermanager.xml:system/vendor/etc/thermanager.xml
