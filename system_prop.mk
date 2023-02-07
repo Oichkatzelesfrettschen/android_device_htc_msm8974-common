@@ -60,6 +60,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
     debug.sf.hw=1 \
     debug.renderengine.backend=threaded \
     debug.sf.predict_hwc_composition_strategy=0 \
+    debug.sf.enable_transaction_tracing=false \
     dev.pm.dyn_samplingrate=1 \
     persist.hwc.mdpcomp.enable=true \
     ro.opengles.version=196608 \
