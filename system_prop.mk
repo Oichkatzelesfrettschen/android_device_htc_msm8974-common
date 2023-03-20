@@ -23,6 +23,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
     ro.bt.bdaddr_path=/sys/module/htc_bdaddress/parameters/bdaddress \
     ro.qualcomm.bt.hci_transport=smd \
     bluetooth.device.class_of_device=90,2,12 \
+    bluetooth.le.disable_apcf_extended_features=1 \
     bluetooth.profile.a2dp.source.enabled=true \
     bluetooth.profile.asha.central.enabled=true \
     bluetooth.profile.avrcp.target.enabled=true \
