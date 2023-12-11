@@ -55,6 +55,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 # Graphics
 PRODUCT_PROPERTY_OVERRIDES += \
+    ro.hardware.egl=adreno \
     debug.egl.hw=1 \
     debug.hwui.use_buffer_age=false \
     debug.mdpcomp.logs=0 \
