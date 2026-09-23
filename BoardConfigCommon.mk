@@ -148,9 +148,9 @@ TARGET_LD_SHIM_LIBS := \
     /system/vendor/lib/libril_vzw-qc-qmi-1.so|libshim_ril.so \
     /system/vendor/lib/libril-qc-qmi-1.so|libshim_ril.so \
     /system/lib/liblog.so|liblog_htc.so \
-    /system/vendor/lib/libril_spr-qc-qmi-1.so|libaudioclient_shim.so \
-    /system/vendor/lib/libril_vzw-qc-qmi-1.so|libaudioclient_shim.so \
-    /system/vendor/lib/libril-qc-qmi-1.so|libaudioclient_shim.so
+    /system/vendor/lib/libril_spr-qc-qmi-1.so|libshim_audioclient.so \
+    /system/vendor/lib/libril_vzw-qc-qmi-1.so|libshim_audioclient.so \
+    /system/vendor/lib/libril-qc-qmi-1.so|libshim_audioclient.so
 $(call soong_config_set,bionic_linker,ld_shim_libs,$(subst $(space),:,$(strip $(TARGET_LD_SHIM_LIBS))))
 
 # Wifi
