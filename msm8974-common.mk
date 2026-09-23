@@ -245,14 +245,18 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PACKAGES += \
     libc2dcolorconvert \
     libminijail:32 \
+    libOmxAacEnc \
+    libOmxAmrEnc \
     libOmxCore \
+    libOmxEvrcEnc \
+    libOmxQcelp13Enc \
     libOmxVdec \
     libOmxVenc \
     libstagefrighthw
 
 # Power
 PRODUCT_PACKAGES += \
-    android.hardware.power-service.example \
+    android.hardware.power-service-qti \
     android.hardware.power.stats@1.0-service.mock
 
 # Protobuf
