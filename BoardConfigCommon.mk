@@ -76,6 +76,10 @@ $(call project-set-path,qcom-media,hardware/qcom/media)
 $(call project-set-path,qcom-bt-vendor,hardware/qcom-caf/bt)
 $(call project-set-path,qcom-dataservices,vendor/qcom/opensource/dataservices)
 $(call project-set-path,qcom-wlan,hardware/qcom-caf/wlan)
+# WLAN userspace (wcnss_service, wifi_hal, lib_driver_cmd_qcwcn) builds from
+# hardware/qcom-caf/wlan; the AOSP hardware/qcom/wlan copy defines the same
+# modules and stays off.
+TARGET_USES_HARDWARE_QCOM_WLAN := false
 
 # ANT+
 BOARD_ANT_WIRELESS_DEVICE := "vfs-prerelease"
