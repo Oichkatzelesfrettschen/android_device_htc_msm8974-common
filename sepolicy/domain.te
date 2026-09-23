@@ -3,3 +3,12 @@
 # the target keeps the unresolved path, which is already canonical, so shim
 # matching is unchanged; the loading domains hold explicit grants.
 dontaudit domain vendor_shim_target_file:file { audit_access getattr };
+
+# libGLESv2_adreno reads kgsl-3d0/gpuclk, which qcom policy grants to every
+# domain; reaching it needs search on the kgsl-3d0 directory.
+allow domain sysfs_kgsl:dir search;
+
+# Platform code probes unset QTI properties (audio policy and haptic effect in
+# audioserver, virtual-display composition in surfaceflinger); the default
+# value applies when the read fails.
+dontaudit { audioserver surfaceflinger } vendor_qti_probe_prop:file r_file_perms;

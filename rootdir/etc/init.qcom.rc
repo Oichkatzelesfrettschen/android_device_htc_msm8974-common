@@ -116,6 +116,7 @@ on post-fs-data
     chmod 2775 /data/audio
 
     mkdir /data/misc/sms 0770 system radio
+    mkdir /data/vendor/sensors 0770 system system
 
     # Create a folder for SRS to be able to create a usercfg file
     mkdir /data/data/media 0770 media media

@@ -1,0 +1,22 @@
+# Platform-side init actions for this device. Each one touches a path or
+# property that vendor_init may not reach.
+
+on post-fs-data
+    # TWRP writes /cache/recovery/intent and last_log.gz with a context this
+    # policy does not define; RecoverySystem deletes them once they carry
+    # cache_recovery_file.
+    restorecon_recursive /cache/recovery
+
+    # The sensors HAL opens its calibration files under /data/misc by
+    # hardcoded path. The files live in /data/vendor/sensors; the links carry
+    # sensors_data_file so the HAL can follow them.
+    symlink /data/vendor/sensors/cw_calibrator_mag.ini /data/misc/cw_calibrator_mag.ini
+    symlink /data/vendor/sensors/AccOffset.txt /data/misc/AccOffset.txt
+    restorecon /data/misc/cw_calibrator_mag.ini
+    restorecon /data/misc/AccOffset.txt
+
+# The swcodec APEX carries a linker config that resolves its HAL clients
+# through namespaces this device's legacy blobs do not satisfy; the system
+# copy replaces it once apexd has activated the APEX.
+on property:apexd.status=ready
+    mount none /system/etc/swcodec/ld.config.txt /apex/com.android.media.swcodec/etc/ld.config.txt bind

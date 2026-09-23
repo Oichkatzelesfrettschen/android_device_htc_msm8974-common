@@ -10,7 +10,6 @@ persist.hwc.                        u:object_r:vendor_hwc_prop:s0
 persist.metadata_dynfps.disable     u:object_r:vendor_hwc_prop:s0 exact
 persist.user.panel3D                u:object_r:vendor_hwc_prop:s0 exact
 ro.qcom.ad                          u:object_r:vendor_hwc_prop:s0 exact
-ro.graphics.memory                  u:object_r:vendor_hwc_prop:s0 exact
 
 # Location
 gps.disable                         u:object_r:location_prop:s0 exact
@@ -33,6 +32,7 @@ persist.cne.                        u:object_r:vendor_qcom_data_prop:s0
 # qmuxd
 persist.radio.enable.oem98          u:object_r:vendor_qcom_data_prop:s0 exact
 persist.radio.sglte_csfb            u:object_r:vendor_qcom_data_prop:s0 exact
+persist.radio.MR_timeout            u:object_r:vendor_qcom_data_prop:s0 exact
 
 # qcril
 persist.qcril.                      u:object_r:vendor_qcril_prop:s0
@@ -46,3 +46,9 @@ ro.cid                              u:object_r:vendor_qcril_prop:s0 exact
 
 # Video decoder
 persist.vidc.                       u:object_r:vendor_video_prop:s0
+vidc.                               u:object_r:vendor_video_prop:s0
+
+# Probed by platform code for QTI features this device lacks
+ro.vendor.qti.va_aosp.support       u:object_r:vendor_qti_probe_prop:s0 exact
+vendor.audio.hapticgenerator.distortion.output.gain u:object_r:vendor_qti_probe_prop:s0 exact
+vendor.display.vds_allow_hwc        u:object_r:vendor_qti_probe_prop:s0 exact

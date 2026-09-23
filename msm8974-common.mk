@@ -87,7 +87,7 @@ PRODUCT_PACKAGES += \
 # APEX
 PRODUCT_COMPRESSED_APEX := false
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/configs/init.swcodec-ldconfig.rc:$(TARGET_COPY_OUT_SYSTEM)/etc/init/swcodec-ldconfig.rc \
+    $(LOCAL_PATH)/configs/init.msm8974.system.rc:$(TARGET_COPY_OUT_SYSTEM)/etc/init/init.msm8974.system.rc \
     $(LOCAL_PATH)/configs/ld.config.txt:$(TARGET_COPY_OUT_SYSTEM)/etc/swcodec/ld.config.txt
 
 # Audio

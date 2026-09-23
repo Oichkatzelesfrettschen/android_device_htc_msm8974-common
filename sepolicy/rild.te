@@ -7,3 +7,5 @@ get_prop(rild, system_prop)
 get_prop(rild, vendor_qcom_data_prop)
 get_prop(rild, vendor_qcril_prop)
 get_prop(rild, vendor_rild_libpath_prop)
+# SQLite probes F2FS_IOC_GET_FEATURES on qcril.db.
+allowxperm rild qcril_device:file ioctl 0xf50c;

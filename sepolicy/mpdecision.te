@@ -1,1 +1,2 @@
 allow mpdecision sysfs_graphics:dir search;
+allow mpdecision sysfs_kgsl:file rw_file_perms;
