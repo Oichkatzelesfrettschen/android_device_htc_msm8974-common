@@ -57,9 +57,11 @@ BOARD_KERNEL_IMAGE_NAME := zImage
 BOARD_KERNEL_PAGESIZE := 2048
 BOARD_KERNEL_SEPARATED_DT := true
 BOARD_MKBOOTIMG_ARGS := --kernel_offset 0x00008000 --ramdisk_offset 0x02008000 --tags_offset 0x01e00000
-BOARD_RAMDISK_USE_XZ := true
 TARGET_KERNEL_SOURCE := kernel/htc/msm8974
 TARGET_KERNEL_CLANG_COMPILE := false
+TARGET_KERNEL_LLVM_BINUTILS := false
+TARGET_KERNEL_NO_GCC := false
+TARGET_KERNEL_ADDITIONAL_FLAGS := HOSTCFLAGS="-fuse-ld=lld -fcommon -Wno-unused-command-line-argument"
 
 BUILD_BROKEN_USES_BUILD_COPY_HEADERS := true
 BUILD_BROKEN_ELF_PREBUILT_PRODUCT_COPY_FILES := true
@@ -85,24 +87,17 @@ AUDIO_FEATURE_LOW_LATENCY_PRIMARY := true
 BOARD_USES_ALSA_AUDIO := true
 USE_CUSTOM_AUDIO_POLICY := 1
 
-# Apex
-OVERRIDE_TARGET_FLATTEN_APEX := true
-
 # Bluetooth
 BOARD_HAVE_BLUETOOTH_QCOM := true
 
 # Boot animation
 TARGET_BOOTANIMATION_HALF_RES := true
 
-# Camera
-TARGET_HAS_LEGACY_CAMERA_HAL1 := true
-
 # Charge mode
 BOARD_CHARGING_MODE_BOOTING_LPM := /sys/htc_lpm/lpm_mode
 
 # Display
 TARGET_SCREEN_DENSITY := 480
-TARGET_DISABLE_POSTRENDER_CLEANUP := true
 
 # Filesystem
 TARGET_FS_CONFIG_GEN := $(PLATFORM_PATH)/config.fs
@@ -119,6 +114,7 @@ MAX_EGL_CACHE_KEY_SIZE := 12*1024
 MAX_EGL_CACHE_SIZE := 2048*1024
 TARGET_ADDITIONAL_GRALLOC_10_USAGE_BITS := 0x02000000U
 TARGET_FORCE_HWC_FOR_VIRTUAL_DISPLAYS := true
+TARGET_USES_VULKAN := false
 
 # HIDL
 DEVICE_MANIFEST_FILE := $(PLATFORM_PATH)/manifest.xml
@@ -128,14 +124,8 @@ PRODUCT_ENFORCE_VINTF_MANIFEST_OVERRIDE := true
 # Lights
 TARGET_PROVIDES_LIBLIGHT := true
 
-# memfd
-TARGET_HAS_MEMFD_BACKPORT := true
-
 # Power
 TARGET_USES_INTERACTION_BOOST := true
-
-# SDClang
-TARGET_USE_SDCLANG := true
 
 # SELinux
 # include device/qcom/sepolicy-legacy/sepolicy.mk
@@ -153,6 +143,7 @@ TARGET_LD_SHIM_LIBS := \
     /system/vendor/lib/libril_spr-qc-qmi-1.so|libaudioclient_shim.so \
     /system/vendor/lib/libril_vzw-qc-qmi-1.so|libaudioclient_shim.so \
     /system/vendor/lib/libril-qc-qmi-1.so|libaudioclient_shim.so
+$(call soong_config_set,bionic_linker,ld_shim_libs,$(subst $(space),:,$(strip $(TARGET_LD_SHIM_LIBS))))
 
 # Wifi
 BOARD_HAS_QCOM_WLAN := true
@@ -182,6 +173,9 @@ BOARD_ROOT_EXTRA_SYMLINKS := \
 BOARD_FLASH_BLOCK_SIZE := 131072
 TARGET_USERIMAGES_USE_EXT4 := true
 TARGET_USERIMAGES_USE_F2FS := true
+
+# Dexpreopt
+WITH_DEXPREOPT_BOOT_IMG_AND_SYSTEM_SERVER_ONLY := true
 
 # Recovery
 BOOTLOADER_MESSAGE_OFFSET := 2048
