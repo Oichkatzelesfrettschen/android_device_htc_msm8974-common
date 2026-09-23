@@ -34,6 +34,9 @@ TARGET_SPECIFIC_HEADER_PATH += $(PLATFORM_PATH)/include
 TARGET_BOOTLOADER_BOARD_NAME := MSM8974
 TARGET_NO_BOOTLOADER := true
 
+# Non-A/B: a single boot and system slot, flashed by an edify updater-script
+AB_OTA_UPDATER := false
+
 # Platform
 TARGET_BOARD_PLATFORM := msm8974
 
