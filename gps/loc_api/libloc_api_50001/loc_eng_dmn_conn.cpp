@@ -117,7 +117,6 @@ static int loc_api_server_proc_pre(void *context)
 static int loc_api_server_proc(void *context)
 {
     int length, sz;
-    int result = 0;
     static int cnt = 0;
     struct ctrl_msgbuf * p_cmsgbuf;
     struct ctrl_msgbuf cmsg_resp;
@@ -143,11 +142,11 @@ static int loc_api_server_proc(void *context)
     LOC_LOGD("%s:%d] received ctrl_type = %d\n", __func__, __LINE__, p_cmsgbuf->ctrl_type);
     switch(p_cmsgbuf->ctrl_type) {
         case GPSONE_LOC_API_IF_REQUEST:
-            result = loc_eng_dmn_conn_loc_api_server_if_request_handler(p_cmsgbuf, length);
+            loc_eng_dmn_conn_loc_api_server_if_request_handler(p_cmsgbuf, length);
             break;
 
         case GPSONE_LOC_API_IF_RELEASE:
-            result = loc_eng_dmn_conn_loc_api_server_if_release_handler(p_cmsgbuf, length);
+            loc_eng_dmn_conn_loc_api_server_if_release_handler(p_cmsgbuf, length);
             break;
 
         case GPSONE_UNBLOCK:

@@ -198,16 +198,12 @@ static void loc_inform_gps_status(loc_eng_data_s_type &loc_eng_data,
                                   GpsStatusValue status);
 static void loc_eng_report_status(loc_eng_data_s_type &loc_eng_data,
                                   GpsStatusValue status);
-static void loc_eng_process_conn_request(loc_eng_data_s_type &loc_eng_data,
-                                         int connHandle, AGpsType agps_type);
-static void loc_eng_agps_close_status(loc_eng_data_s_type &loc_eng_data, int is_succ);
 static void loc_eng_handle_engine_down(loc_eng_data_s_type &loc_eng_data) ;
 static void loc_eng_handle_engine_up(loc_eng_data_s_type &loc_eng_data) ;
 
 static int loc_eng_start_handler(loc_eng_data_s_type &loc_eng_data);
 static int loc_eng_stop_handler(loc_eng_data_s_type &loc_eng_data);
 static int loc_eng_get_zpp_handler(loc_eng_data_s_type &loc_eng_data);
-static void deleteAidingData(loc_eng_data_s_type &logEng);
 static AgpsStateMachine*
 getAgpsStateMachine(loc_eng_data_s_type& logEng, AGpsExtType agpsType);
 static int dataCallCb(void *cb_data);
@@ -2327,14 +2323,6 @@ void loc_eng_agps_init(loc_eng_data_s_type &loc_eng_data, AGpsExtCallbacks* call
     EXIT_LOG(%s, VOID_RET);
 }
 
-static void deleteAidingData(loc_eng_data_s_type &logEng) {
-    if (logEng.engine_status != GPS_STATUS_ENGINE_ON &&
-        logEng.aiding_data_for_deletion != 0) {
-        logEng.adapter->deleteAidingData(logEng.aiding_data_for_deletion);
-        logEng.aiding_data_for_deletion = 0;
-    }
-}
-
 static AgpsStateMachine*
 getAgpsStateMachine(loc_eng_data_s_type &locEng, AGpsExtType agpsType) {
     AgpsStateMachine* stateMachine;
@@ -2535,7 +2523,7 @@ static int loc_eng_set_server(loc_eng_data_s_type &loc_eng_data,
         const char nohost[] = "NONE";
         if (hostname == NULL ||
             strncasecmp(nohost, hostname, sizeof(nohost)) == 0) {
-            url[0] = NULL;
+            url[0] = '\0';
         } else {
             len = snprintf(url, sizeof(url), "%s:%u", hostname, (unsigned) port);
         }

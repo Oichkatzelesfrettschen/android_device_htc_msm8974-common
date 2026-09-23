@@ -30,6 +30,7 @@
 #define LOG_NDDEBUG 0
 #define LOG_TAG "LocSvc_afw"
 
+#include <inttypes.h>
 #include <hardware/gps.h>
 #include <gps_extended.h>
 #include <loc_eng.h>
@@ -244,7 +245,7 @@ extern "C" const GpsInterface* get_gps_interface()
             LOC_LOGE("GSS open failed: %s\n", strerror(errno));
         }
         else {
-            LOC_LOGD("GSS open success! CAPABILITIES %0lx\n",
+            LOC_LOGD("GSS open success! CAPABILITIES %0" PRIx32 "\n",
                      gps_conf.CAPABILITIES);
         }
         break;
@@ -255,7 +256,7 @@ extern "C" const GpsInterface* get_gps_interface()
     case GNSS_QCA1530:
         // qca1530 chip is present
         gps_conf.CAPABILITIES &= ~(GPS_CAPABILITY_MSA | GPS_CAPABILITY_MSB);
-        LOC_LOGD("qca1530 present: CAPABILITIES %0lx\n", gps_conf.CAPABILITIES);
+        LOC_LOGD("qca1530 present: CAPABILITIES %0" PRIx32 "\n", gps_conf.CAPABILITIES);
         break;
     }
     return &sLocEngInterface;
