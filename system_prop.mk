@@ -78,7 +78,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
     ro.surface_flinger.max_frame_buffer_acquired_buffers=3 \
     ro.surface_flinger.max_virtual_display_dimension=2048 \
     ro.surface_flinger.running_without_sync_framework=false \
-    ro.surface_flinger.start_graphics_allocator_service=true \
     ro.surface_flinger.supports_background_blur=0 \
     ro.surface_flinger.use_context_priority=true
 
