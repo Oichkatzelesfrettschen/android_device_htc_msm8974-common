@@ -1,0 +1,2 @@
+# storaged reads per-device I/O counters from /sys/block/mmcblk0/stat.
+r_dir_file(storaged, sysfs_disk_stat)

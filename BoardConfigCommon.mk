@@ -129,10 +129,28 @@ TARGET_PROVIDES_LIBLIGHT := true
 TARGET_USES_INTERACTION_BOOST := true
 
 # SELinux
-include device/qcom/sepolicy-legacy/sepolicy.mk
+# The directories device/qcom/sepolicy-legacy/sepolicy.mk lists, without its
+# include of device/lineage/sepolicy/qcom: that policy renames hal_gnss_qti,
+# sysfs_graphics and other legacy types to vendor_* through
+# BOARD_SEPOLICY_M4DEFS and references vendor_hal_soter_client, which only
+# the UM-family vendor policy declares.
 BOARD_VENDOR_SEPOLICY_DIRS += \
+    device/qcom/sepolicy-legacy/common \
+    device/qcom/sepolicy-legacy/ssg \
+    device/qcom/sepolicy-legacy/$(TARGET_BOARD_PLATFORM) \
+    device/qcom/sepolicy-legacy/legacy-common \
     $(PLATFORM_PATH)/sepolicy \
     $(PLATFORM_PATH)/sepolicy-minimal
+ifneq (,$(filter userdebug eng, $(TARGET_BUILD_VARIANT)))
+BOARD_VENDOR_SEPOLICY_DIRS += device/qcom/sepolicy-legacy/test
+endif
+SYSTEM_EXT_PUBLIC_SEPOLICY_DIRS += \
+    device/qcom/sepolicy-legacy/public \
+    $(PLATFORM_PATH)/sepolicy/public
+SYSTEM_EXT_PRIVATE_SEPOLICY_DIRS += \
+    device/qcom/sepolicy-legacy/private \
+    $(PLATFORM_PATH)/sepolicy/private
+BOARD_SEPOLICY_VERS := $(PLATFORM_SDK_VERSION).0
 SELINUX_IGNORE_NEVERALLOWS := true
 
 # Shims
