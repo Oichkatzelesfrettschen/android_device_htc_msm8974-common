@@ -58,6 +58,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.hardware.egl=adreno \
     debug.egl.hw=1 \
+    debug.hwui.renderer=opengl \
     debug.hwui.use_buffer_age=false \
     debug.mdpcomp.logs=0 \
     debug.sf.disable_backpressure=1 \
@@ -68,7 +69,18 @@ PRODUCT_PROPERTY_OVERRIDES += \
     dev.pm.dyn_samplingrate=1 \
     persist.hwc.mdpcomp.enable=true \
     ro.opengles.version=196608 \
-    ro.surface_flinger.max_frame_buffer_acquired_buffers=3
+    persist.sys.sf.disable_blurs=1 \
+    ro.sf.blurs_are_expensive=1 \
+    ro.surface_flinger.enable_frame_rate_override=false \
+    ro.surface_flinger.force_hwc_copy_for_virtual_displays=true \
+    ro.surface_flinger.has_HDR_display=false \
+    ro.surface_flinger.has_wide_color_display=false \
+    ro.surface_flinger.max_frame_buffer_acquired_buffers=3 \
+    ro.surface_flinger.max_virtual_display_dimension=2048 \
+    ro.surface_flinger.running_without_sync_framework=false \
+    ro.surface_flinger.start_graphics_allocator_service=true \
+    ro.surface_flinger.supports_background_blur=0 \
+    ro.surface_flinger.use_context_priority=true
 
 # GPS
 PRODUCT_PROPERTY_OVERRIDES += \
