@@ -57,6 +57,12 @@ BOARD_KERNEL_IMAGE_NAME := zImage
 BOARD_KERNEL_PAGESIZE := 2048
 BOARD_KERNEL_SEPARATED_DT := true
 BOARD_MKBOOTIMG_ARGS := --kernel_offset 0x00008000 --ramdisk_offset 0x02008000 --tags_offset 0x01e00000
+# The ramdisks are xz, as on LineageOS 21 (the kernel has CONFIG_RD_XZ): a
+# gzip recovery ramdisk puts recovery.img above 99% of its 24 MiB partition.
+# build/make/core/Makefile runs $(XZ) for BOARD_RAMDISK_USE_XZ and nothing
+# in the tree defines it.
+BOARD_RAMDISK_USE_XZ := true
+XZ := prebuilts/build-tools/$(HOST_PREBUILT_TAG)/bin/xz
 TARGET_KERNEL_SOURCE := kernel/htc/msm8974
 TARGET_KERNEL_CLANG_COMPILE := false
 TARGET_KERNEL_LLVM_BINUTILS := false
