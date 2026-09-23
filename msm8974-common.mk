@@ -24,15 +24,6 @@ PRODUCT_COPY_FILES += \
 # System properties
 -include $(LOCAL_PATH)/system_prop.mk
 
-# QCOM CAF projects built without BOARD_USES_QCOM_HARDWARE
-PRODUCT_SOONG_NAMESPACES += \
-    hardware/qcom-caf/bt/libbt-vendor \
-    hardware/qcom-caf/wlan \
-    vendor/qcom/opensource/dataservices
-
-PRODUCT_CFI_INCLUDE_PATHS += \
-    hardware/qcom-caf/wlan/qcwcn/wpa_supplicant_8_lib
-
 # Overlays
 DEVICE_PACKAGE_OVERLAYS += \
     $(LOCAL_PATH)/overlay \
