@@ -134,6 +134,9 @@ PRODUCT_PACKAGES += \
     android.hardware.bluetooth@1.0-impl \
     libbt-vendor
 
+PRODUCT_SOONG_NAMESPACES += \
+    hardware/qcom-caf/bt/libbt-vendor
+
 # Camera
 PRODUCT_PACKAGES += \
     android.hardware.camera.provider@2.4-impl \
