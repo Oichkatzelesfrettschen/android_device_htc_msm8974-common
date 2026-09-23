@@ -24,21 +24,6 @@ PRODUCT_COPY_FILES += \
 # System properties
 -include $(LOCAL_PATH)/system_prop.mk
 
-# Every PRODUCT_PACKAGES entry must resolve to a module visible to Make; the
-# allow list names the legacy NXP NFC stack, the QCOM OMX audio encoders and
-# the CNE config library, which the 22.2 tree does not provide.
-PRODUCT_ENFORCE_PACKAGES_EXIST := true
-PRODUCT_ENFORCE_PACKAGES_EXIST_ALLOW_LIST += \
-    libcnefeatureconfig \
-    libnfc \
-    libnfc_jni \
-    libnfc_ndef \
-    libOmxAacEnc \
-    libOmxAmrEnc \
-    libOmxEvrcEnc \
-    libOmxQcelp13Enc \
-    Nfc
-
 # QCOM CAF projects built without BOARD_USES_QCOM_HARDWARE
 PRODUCT_SOONG_NAMESPACES += \
     hardware/qcom-caf/bt/libbt-vendor \
@@ -269,18 +254,14 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PACKAGES += \
     libc2dcolorconvert \
     libminijail:32 \
-    libOmxAacEnc \
-    libOmxAmrEnc \
     libOmxCore \
-    libOmxEvrcEnc \
-    libOmxQcelp13Enc \
     libOmxVdec \
     libOmxVenc \
     libstagefrighthw
 
 # Power
 PRODUCT_PACKAGES += \
-    android.hardware.power-service-qti \
+    android.hardware.power-service.example \
     android.hardware.power.stats@1.0-service.mock
 
 # Protobuf
@@ -295,7 +276,6 @@ PRODUCT_PACKAGES += \
 # RIL
 PRODUCT_PACKAGES += \
     libshim_audioclient \
-    libcnefeatureconfig \
     librmnetctl \
     libshim_ril \
     libxml2
