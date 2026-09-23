@@ -1,0 +1,20 @@
+// libcnefeatureconfig from CodeAurora external/connectivity: netmgrd and
+// libcneapiclient list it as DT_NEEDED, and CneFeatureConfig reports the CNE
+// feature set selected by persist.cne.feature.
+
+cc_library_shared {
+    name: "libcnefeatureconfig",
+    vendor: true,
+    srcs: ["src/CneFeatureConfig.cpp"],
+    local_include_dirs: ["inc"],
+    export_include_dirs: ["inc"],
+    shared_libs: [
+        "libcutils",
+        "liblog",
+    ],
+    cflags: [
+        "-Wall",
+        "-Werror",
+        "-Wextra",
+    ],
+}
