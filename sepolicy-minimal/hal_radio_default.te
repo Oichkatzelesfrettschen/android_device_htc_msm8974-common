@@ -1,0 +1,8 @@
+# android.hardware.radio@1.4-service.legacy is a client of the IRadio 1.0 HAL
+# that rild serves and a server of IRadio 1.4 to the framework. Both rild and
+# the wrapper are hal_telephony servers, so the server-to-client binder rules
+# of hal_telephony do not cover calls between them: the wrapper calls rild,
+# and rild delivers IRadioResponse and IRadioIndication callbacks back into
+# the wrapper.
+binder_call(hal_radio_default, rild)
+binder_call(rild, hal_radio_default)

@@ -296,5 +296,12 @@ on property:ro.data.large_tcp_window_size=true
     # Adjust socket buffer to enlarge TCP receive window for high bandwidth (e.g. DO-RevB)
     write /proc/sys/net/ipv4/tcp_adv_win_scale  2
 
+# The radio 1.4 wrapper replaces rild's IRadio/slot1 registration with its
+# own, so a restarted wrapper finds no 1.0 slot1 service to wrap until rild
+# registers again.
+on property:init.svc.vendor.radio-1-4-legacy=restarting
+    stop vendor.ril-daemon
+    start vendor.ril-daemon
+
 on property:apexd.status=ready
     mount none /system/etc/swcodec/ld.config.txt /apex/com.android.media.swcodec/etc/ld.config.txt bind
