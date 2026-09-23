@@ -1,0 +1,2 @@
+allow hal_bluetooth_default sysfs_bluetooth_writable:file r_file_perms;
+set_prop(hal_bluetooth_default, vendor_bt_loader_prop)

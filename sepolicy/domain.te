@@ -1,0 +1,5 @@
+# bionic's parse_LD_SHIM_LIBS calls access(R_OK) and realpath() on every
+# TARGET_LD_SHIM_LIBS target at each process start. A domain without read on
+# the target keeps the unresolved path, which is already canonical, so shim
+# matching is unchanged; the loading domains hold explicit grants.
+dontaudit domain vendor_shim_target_file:file { audit_access getattr };

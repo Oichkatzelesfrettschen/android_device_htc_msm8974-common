@@ -1,1 +1,4 @@
 allow init proc_last_kmsg:file { r_file_perms setattr };
+
+# init.rc writes discard_max_bytes through /dev/sys/block/by-name/userdata.
+allow init sysfs_devices_block:file w_file_perms;

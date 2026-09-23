@@ -1,1 +1,48 @@
 htc.camera.                        u:object_r:camera_prop:s0
+
+# Bluetooth enable handshake between libbt-vendor and init.qcom.bt.sh
+vendor.bluetooth.hciattach          u:object_r:vendor_bt_loader_prop:s0 exact
+vendor.bluetooth.status             u:object_r:vendor_bt_loader_prop:s0 exact
+qcom.bt.                            u:object_r:vendor_bt_loader_prop:s0
+
+# Composer
+persist.hwc.                        u:object_r:vendor_hwc_prop:s0
+persist.metadata_dynfps.disable     u:object_r:vendor_hwc_prop:s0 exact
+persist.user.panel3D                u:object_r:vendor_hwc_prop:s0 exact
+ro.qcom.ad                          u:object_r:vendor_hwc_prop:s0 exact
+ro.graphics.memory                  u:object_r:vendor_hwc_prop:s0 exact
+
+# Location
+gps.disable                         u:object_r:location_prop:s0 exact
+ro.lean                             u:object_r:location_prop:s0 exact
+ro.gps.                             u:object_r:location_prop:s0
+persist.gps.                        u:object_r:location_prop:s0
+ro.qc.sdk.izat.                     u:object_r:location_prop:s0
+
+# mpdecision
+ro.qualcomm.perf.cores_online       u:object_r:mpdecision_prop:s0 exact
+
+# Modem data services: netmgrd, qmuxd, rmt_storage, time_daemon, libdsutils
+ro.baseband.arch                    u:object_r:vendor_qcom_data_prop:s0 exact
+ro.use_data_netmgrd                 u:object_r:vendor_qcom_data_prop:s0 exact
+persist.data.                       u:object_r:vendor_qcom_data_prop:s0
+persist.data_netmgrd_               u:object_r:vendor_qcom_data_prop:s0
+persist.net.logmask                 u:object_r:vendor_qcom_data_prop:s0 exact
+persist.cne.                        u:object_r:vendor_qcom_data_prop:s0
+
+# qmuxd
+persist.radio.enable.oem98          u:object_r:vendor_qcom_data_prop:s0 exact
+persist.radio.sglte_csfb            u:object_r:vendor_qcom_data_prop:s0 exact
+
+# qcril
+persist.qcril.                      u:object_r:vendor_qcril_prop:s0
+persist.qcril_                      u:object_r:vendor_qcril_prop:s0
+persist.rild.                       u:object_r:vendor_qcril_prop:s0
+persist.lte.band.pref               u:object_r:vendor_qcril_prop:s0 exact
+persist.fci                         u:object_r:vendor_qcril_prop:s0 exact
+persist.env.spec                    u:object_r:vendor_qcril_prop:s0 exact
+ro.pdn.profile                      u:object_r:vendor_qcril_prop:s0 exact
+ro.cid                              u:object_r:vendor_qcril_prop:s0 exact
+
+# Video decoder
+persist.vidc.                       u:object_r:vendor_video_prop:s0

@@ -38,10 +38,25 @@
 /(vendor|system/vendor)/bin/hw/android\.hardware\.power\.stats@1\.0-service\.mock    u:object_r:hal_power_stats_default_exec:s0
 /(vendor|system/vendor)/bin/hw/vendor\.lineage\.touch@1\.0-service\.htc_msm8974               u:object_r:hal_lineage_touch_default_exec:s0
 
+# Same-process HALs mapped by every graphics client
+/(vendor|system/vendor)/lib/hw/gralloc\.msm8974\.so                                   u:object_r:same_process_hal_file:s0
+/(vendor|system/vendor)/lib/libmemalloc\.so                                           u:object_r:same_process_hal_file:s0
+/(vendor|system/vendor)/lib/libsc-a3xx\.so                                            u:object_r:same_process_hal_file:s0
+
+# TARGET_LD_SHIM_LIBS targets
+/(vendor|system/vendor)/lib/hw/camera\.vendor\.msm8974\.so                            u:object_r:vendor_shim_target_file:s0
+/(vendor|system/vendor)/lib/libril(_spr|_vzw)?-qc-qmi-1\.so                           u:object_r:vendor_shim_target_file:s0
+
+# Vendor configuration the location, audio and IR blobs open under /etc
+/system/etc/(flp|gps|izat|sap)\.conf                                                  u:object_r:vendor_configs_file:s0
+/system/etc/[A-Za-z_]+_cal(_recovery)?\.acdb                                          u:object_r:vendor_configs_file:s0
+/system/etc/cir\.img                                                                  u:object_r:vendor_configs_file:s0
+
 # Rootfs files
 /tombstones                                                                          u:object_r:rootfs:s0
 
 # Sysfs nodes
+/sys/devices/msm_sdcc\.1/mmc_host/mmc0/mmc0:[0-9a-f]+/block/mmcblk0/queue/discard_max_bytes   u:object_r:sysfs_devices_block:s0
 /sys/android_camera([0-9]+)?/sensor                                                  u:object_r:sysfs_camera_sensor:s0
 /sys/devices/f9925000\.i2c/i2c-1/1-[0-9a-f]+/leds/flashlight(/.*)?                   u:object_r:sysfs_flashlight:s0
 /sys/devices/qpnp-bms-(.*)?/power_supply/bms(/.*)?                                   u:object_r:sysfs_battery_supply:s0

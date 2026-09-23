@@ -139,7 +139,9 @@ TARGET_USES_INTERACTION_BOOST := true
 # include of device/lineage/sepolicy/qcom: that policy renames hal_gnss_qti,
 # sysfs_graphics and other legacy types to vendor_* through
 # BOARD_SEPOLICY_M4DEFS and references vendor_hal_soter_client, which only
-# the UM-family vendor policy declares.
+# the UM-family vendor policy declares. The test directory carries policy for
+# qcom test binaries this device does not ship; ssg stays because
+# common/ssgtzd.te references its ssg_app type.
 BOARD_VENDOR_SEPOLICY_DIRS += \
     device/qcom/sepolicy-legacy/common \
     device/qcom/sepolicy-legacy/ssg \
@@ -147,9 +149,6 @@ BOARD_VENDOR_SEPOLICY_DIRS += \
     device/qcom/sepolicy-legacy/legacy-common \
     $(PLATFORM_PATH)/sepolicy \
     $(PLATFORM_PATH)/sepolicy-minimal
-ifneq (,$(filter userdebug eng, $(TARGET_BUILD_VARIANT)))
-BOARD_VENDOR_SEPOLICY_DIRS += device/qcom/sepolicy-legacy/test
-endif
 SYSTEM_EXT_PUBLIC_SEPOLICY_DIRS += \
     device/qcom/sepolicy-legacy/public \
     $(PLATFORM_PATH)/sepolicy/public

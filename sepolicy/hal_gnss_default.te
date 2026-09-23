@@ -1,0 +1,3 @@
+get_prop(hal_gnss_default, location_prop)
+get_prop(hal_gnss_default, system_prop)
+get_prop(hal_gnss_default, vendor_qcom_data_prop)
