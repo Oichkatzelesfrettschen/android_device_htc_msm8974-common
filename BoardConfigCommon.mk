@@ -64,7 +64,18 @@ BUILD_BROKEN_USES_BUILD_COPY_HEADERS := true
 BUILD_BROKEN_ELF_PREBUILT_PRODUCT_COPY_FILES := true
 
 # QCOM hardware
-BOARD_USES_QCOM_HARDWARE := true
+# The msm8974 display, audio and media HALs build from hardware/qcom/*, which
+# hardware/qcom-caf/common/os_pickup_aosp.mk includes only while
+# BOARD_USES_QCOM_HARDWARE is unset. The pathmap entries below stand in for
+# vendor/lineage/build/core/qcom_target.mk, and qcom_boards.mk keeps msm8974 a
+# QCOM board platform for is-vendor-board-platform.
+include hardware/qcom-caf/common/qcom_boards.mk
+$(call project-set-path,qcom-audio,hardware/qcom/audio)
+$(call project-set-path,qcom-display,hardware/qcom/display)
+$(call project-set-path,qcom-media,hardware/qcom/media)
+$(call project-set-path,qcom-bt-vendor,hardware/qcom-caf/bt)
+$(call project-set-path,qcom-dataservices,vendor/qcom/opensource/dataservices)
+$(call project-set-path,qcom-wlan,hardware/qcom-caf/wlan)
 
 # ANT+
 BOARD_ANT_WIRELESS_DEVICE := "vfs-prerelease"
@@ -109,7 +120,7 @@ USE_OPENGL_RENDERER := true
 OVERRIDE_RS_DRIVER := libRSDriver_adreno.so
 MAX_EGL_CACHE_KEY_SIZE := 12*1024
 MAX_EGL_CACHE_SIZE := 2048*1024
-TARGET_ADDITIONAL_GRALLOC_10_USAGE_BITS := 0x02000000U
+TARGET_ADDITIONAL_GRALLOC_10_USAGE_BITS := 0x02000000U | (1 << 10) | (1 << 13) | (1 << 21)
 TARGET_FORCE_HWC_FOR_VIRTUAL_DISPLAYS := true
 TARGET_USES_VULKAN := false
 

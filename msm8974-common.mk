@@ -24,6 +24,30 @@ PRODUCT_COPY_FILES += \
 # System properties
 -include $(LOCAL_PATH)/system_prop.mk
 
+# Every PRODUCT_PACKAGES entry must resolve to a module visible to Make; the
+# allow list names the legacy NXP NFC stack, the QCOM OMX audio encoders and
+# the CNE config library, which the 22.2 tree does not provide.
+PRODUCT_ENFORCE_PACKAGES_EXIST := true
+PRODUCT_ENFORCE_PACKAGES_EXIST_ALLOW_LIST += \
+    libcnefeatureconfig \
+    libnfc \
+    libnfc_jni \
+    libnfc_ndef \
+    libOmxAacEnc \
+    libOmxAmrEnc \
+    libOmxEvrcEnc \
+    libOmxQcelp13Enc \
+    Nfc
+
+# QCOM CAF projects built without BOARD_USES_QCOM_HARDWARE
+PRODUCT_SOONG_NAMESPACES += \
+    hardware/qcom-caf/bt/libbt-vendor \
+    hardware/qcom-caf/wlan \
+    vendor/qcom/opensource/dataservices
+
+PRODUCT_CFI_INCLUDE_PATHS += \
+    hardware/qcom-caf/wlan/qcwcn/wpa_supplicant_8_lib
+
 # Overlays
 DEVICE_PACKAGE_OVERLAYS += \
     $(LOCAL_PATH)/overlay \
