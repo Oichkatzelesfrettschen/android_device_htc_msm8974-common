@@ -129,9 +129,10 @@ TARGET_PROVIDES_LIBLIGHT := true
 TARGET_USES_INTERACTION_BOOST := true
 
 # SELinux
-# include device/qcom/sepolicy-legacy/sepolicy.mk
-# BOARD_SEPOLICY_DIRS += $(PLATFORM_PATH)/sepolicy
-BOARD_SEPOLICY_DIRS += $(PLATFORM_PATH)/sepolicy-minimal
+include device/qcom/sepolicy-legacy/sepolicy.mk
+BOARD_VENDOR_SEPOLICY_DIRS += \
+    $(PLATFORM_PATH)/sepolicy \
+    $(PLATFORM_PATH)/sepolicy-minimal
 SELINUX_IGNORE_NEVERALLOWS := true
 
 # Shims
