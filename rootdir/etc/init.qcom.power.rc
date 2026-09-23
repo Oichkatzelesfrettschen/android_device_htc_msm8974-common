@@ -109,12 +109,9 @@ on enable-low-power
 on boot
     trigger enable-low-power
 
-on property:init.svc.recovery=running
-    trigger enable-low-power
-
 on property:dev.bootcomplete=1
     # Set I/O scheduler
-    setprop sys.io.scheduler "bfq"
+    write /sys/block/mmcblk0/queue/scheduler bfq
 
     # Set perfd properties
     setprop ro.qualcomm.perf.cores_online 2

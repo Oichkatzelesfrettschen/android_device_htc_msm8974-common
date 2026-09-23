@@ -55,10 +55,10 @@ on fs
 
 on post-fs-data
     # Create directories for tombstones
-    mkdir /tombstones/modem 0771 system system
-    mkdir /tombstones/lpass 0771 system system
-    mkdir /tombstones/wcnss 0771 system system
-    mkdir /tombstones/dsps 0771 system system
+    mkdir /data/tombstones/modem 0771 system system
+    mkdir /data/tombstones/lpass 0771 system system
+    mkdir /data/tombstones/wcnss 0771 system system
+    mkdir /data/tombstones/dsps 0771 system system
 
     # Radio permissions
     mkdir /dev/radio 0770 radio radio
@@ -115,7 +115,6 @@ on post-fs-data
     # Enable the setgid bit on the directory
     chmod 2775 /data/audio
 
-    mkdir /data/misc/radio 0770 system radio
     mkdir /data/misc/sms 0770 system radio
 
     # Create a folder for SRS to be able to create a usercfg file
@@ -244,6 +243,7 @@ service hciattach /vendor/bin/init.qcom.bt.sh
     class late_start
     user bluetooth
     group bluetooth net_bt_admin
+    seclabel u:r:bluetooth_loader:s0
     disabled
     oneshot
 
@@ -300,7 +300,7 @@ on property:vendor.bluetooth.hciattach=true
 on property:vendor.bluetooth.hciattach=false
     setprop vendor.bluetooth.status off
 
-on property:ro.data.large_tcp_window_size=true
+on boot
     # Adjust socket buffer to enlarge TCP receive window for high bandwidth (e.g. DO-RevB)
     write /proc/sys/net/ipv4/tcp_adv_win_scale  2
 
@@ -310,6 +310,3 @@ on property:ro.data.large_tcp_window_size=true
 on property:init.svc.vendor.radio-1-4-legacy=restarting
     stop vendor.ril-daemon
     start vendor.ril-daemon
-
-on property:apexd.status=ready
-    mount none /system/etc/swcodec/ld.config.txt /apex/com.android.media.swcodec/etc/ld.config.txt bind

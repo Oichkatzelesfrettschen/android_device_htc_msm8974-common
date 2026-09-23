@@ -1,0 +1,7 @@
+# The swcodec APEX carries a linker config that resolves its HAL clients
+# through namespaces this device's legacy blobs do not satisfy; the system
+# copy replaces it once apexd has activated the APEX. The action sits in a
+# system init file because apexd.status is readable by init and not by
+# vendor_init.
+on property:apexd.status=ready
+    mount none /system/etc/swcodec/ld.config.txt /apex/com.android.media.swcodec/etc/ld.config.txt bind

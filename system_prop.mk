@@ -129,7 +129,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
     vendor.rild.libpath=/vendor/lib/libril-qc-qmi-1.so \
     ril.subscription.types=NV,RUIM \
     ro.baseband.arch=msm \
-    ro.data.large_tcp_window_size=true \
     ro.ril.hsupa.category=6 \
     ro.ril.def.agps.mode=1 \
     ro.telephony.call_ring.multiple=false \
