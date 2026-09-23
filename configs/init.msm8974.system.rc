@@ -4,8 +4,9 @@
 on post-fs-data
     # TWRP writes /cache/recovery/intent and last_log.gz with a context this
     # policy does not define; RecoverySystem deletes them once they carry
-    # cache_recovery_file.
-    restorecon_recursive /cache/recovery
+    # cache_recovery_file. --force bypasses the directory digest, which
+    # records file_contexts and not the files TWRP adds.
+    restorecon_recursive --force /cache/recovery
 
     # The sensors HAL opens its calibration files under /data/misc by
     # hardcoded path. The files live in /data/vendor/sensors; the links carry

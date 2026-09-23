@@ -48,6 +48,9 @@ ro.cid                              u:object_r:vendor_qcril_prop:s0 exact
 persist.vidc.                       u:object_r:vendor_video_prop:s0
 vidc.                               u:object_r:vendor_video_prop:s0
 
+# Probed by libgsl in every GL process, vendor and platform
+ro.graphics.memory                  u:object_r:vendor_gpu_prop:s0 exact
+
 # Probed by platform code for QTI features this device lacks
 ro.vendor.qti.va_aosp.support       u:object_r:vendor_qti_probe_prop:s0 exact
 vendor.audio.hapticgenerator.distortion.output.gain u:object_r:vendor_qti_probe_prop:s0 exact

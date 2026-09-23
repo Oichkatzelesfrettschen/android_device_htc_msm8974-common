@@ -12,3 +12,5 @@ allow domain sysfs_kgsl:dir search;
 # audioserver, virtual-display composition in surfaceflinger); the default
 # value applies when the read fails.
 dontaudit { audioserver surfaceflinger } vendor_qti_probe_prop:file r_file_perms;
+
+get_prop(domain, vendor_gpu_prop)
