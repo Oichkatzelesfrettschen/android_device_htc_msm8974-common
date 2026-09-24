@@ -155,10 +155,6 @@
 /(vendor|system/vendor)/bin/wpa_cli             u:object_r:wcnss_service_exec:s0
 /(vendor|system/vendor)/bin/hw/vendor\.qti\.hardware\.limits@1\.0-service     u:object_r:hal_thermal_default_exec:s0
 /(vendor|system/vendor|system)/bin/wcnss_service       u:object_r:wcnss_service_exec:s0
-/(vendor|system/vendor)/bin/sapd                                u:object_r:sapd_exec:s0
-/(vendor|system/vendor)/bin/btnvtool            u:object_r:btnvtool_exec:s0
-/(vendor|system/vendor)/bin/btsnoop                             u:object_r:btsnoop_exec:s0
-/(vendor|system/vendor)/bin/fmhal_service                       u:object_r:fmhal_service_exec:s0
 /(vendor|system/vendor)/bin/hw/vendor\.nxp\.hardware\.nfc@1\.0-service     u:object_r:hal_nfc_default_exec:s0
 
 ###################################
