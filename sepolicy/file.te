@@ -17,7 +17,3 @@ type sysfs_camera_led_status, fs_type, sysfs_type;
 type sysfs_camera_sensor, fs_type, sysfs_type;
 type sysfs_flashlight, fs_type, sysfs_type;
 type sysfs_virtualkeys, fs_type, sysfs_type;
-
-# Prebuilt camera libraries linked with text relocations; the linker writes
-# their text pages at load, which SELinux checks as execmod.
-type vendor_textrel_file, file_type, vendor_file_type;
