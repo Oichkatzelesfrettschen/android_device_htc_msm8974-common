@@ -4,12 +4,23 @@ htc.camera.                        u:object_r:camera_prop:s0
 vendor.bluetooth.hciattach          u:object_r:vendor_bt_loader_prop:s0 exact
 vendor.bluetooth.status             u:object_r:vendor_bt_loader_prop:s0 exact
 qcom.bt.                            u:object_r:vendor_bt_loader_prop:s0
+bluetooth.isSSR                     u:object_r:vendor_bt_loader_prop:s0 exact
+ro.bluetooth.le.disable             u:object_r:vendor_bt_loader_prop:s0 exact
+ro.qualcomm.bt.hci_transport        u:object_r:vendor_bt_loader_prop:s0 exact
 
 # Composer
 persist.hwc.                        u:object_r:vendor_hwc_prop:s0
 persist.metadata_dynfps.disable     u:object_r:vendor_hwc_prop:s0 exact
 persist.user.panel3D                u:object_r:vendor_hwc_prop:s0 exact
 ro.qcom.ad                          u:object_r:vendor_hwc_prop:s0 exact
+hw.hdmiON                           u:object_r:vendor_hwc_prop:s0 exact
+hw.hdmi.resolution                  u:object_r:vendor_hwc_prop:s0 exact
+hw.underscan_supported              u:object_r:vendor_hwc_prop:s0 exact
+persist.sys.actionsafe.width        u:object_r:vendor_hwc_prop:s0 exact
+persist.sys.actionsafe.height       u:object_r:vendor_hwc_prop:s0 exact
+persist.sys.wfd.virtual             u:object_r:vendor_hwc_prop:s0 exact
+sys.hwc.gpu_perf_mode               u:object_r:vendor_hwc_prop:s0 exact
+sys.hwc.mdp_downscale_enabled       u:object_r:vendor_hwc_prop:s0 exact
 
 # Location
 gps.disable                         u:object_r:location_prop:s0 exact
@@ -17,6 +28,7 @@ ro.lean                             u:object_r:location_prop:s0 exact
 ro.gps.                             u:object_r:location_prop:s0
 persist.gps.                        u:object_r:location_prop:s0
 ro.qc.sdk.izat.                     u:object_r:location_prop:s0
+sys.qca1530                         u:object_r:location_prop:s0 exact
 
 # mpdecision
 ro.qualcomm.perf.cores_online       u:object_r:mpdecision_prop:s0 exact
@@ -46,6 +58,9 @@ persist.fci                         u:object_r:vendor_qcril_prop:s0 exact
 persist.env.spec                    u:object_r:vendor_qcril_prop:s0 exact
 ro.pdn.profile                      u:object_r:vendor_qcril_prop:s0 exact
 ro.cid                              u:object_r:vendor_qcril_prop:s0 exact
+sys.under_silent_reset              u:object_r:vendor_qcril_prop:s0 exact
+sys.under_silent_reset.gsm          u:object_r:vendor_qcril_prop:s0 exact
+persist.sys.tel.autoanswer.ms       u:object_r:vendor_qcril_prop:s0 exact
 
 # Video decoder
 persist.vidc.                       u:object_r:vendor_video_prop:s0
@@ -73,3 +88,10 @@ sys.camera.4k2k.enable              u:object_r:camera_prop:s0 exact
 ro.product.main_camera              u:object_r:camera_prop:s0 exact
 ro.product.ram                      u:object_r:camera_prop:s0 exact
 ro.build.sense.version              u:object_r:camera_prop:s0 exact
+
+# qseecomd listener handshake
+sys.keymaster.loaded                u:object_r:vendor_tee_prop:s0 exact
+sys.listeners.registered            u:object_r:vendor_tee_prop:s0 exact
+
+# wcnss_service dynamic NV switch
+persist.sys.dynamic.nv              u:object_r:vendor_wifi_prop:s0 exact

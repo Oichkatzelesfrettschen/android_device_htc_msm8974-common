@@ -33,7 +33,6 @@ ro.min_freq_4                 u:object_r:freq_prop:s0
 ro.qualcomm.bluetooth.        u:object_r:bluetooth_prop:s0
 camera.                    u:object_r:camera_prop:s0
 persist.camera.            u:object_r:camera_prop:s0
-ro.qualcomm.bt.hci_transport  u:object_r:bluetooth_prop:s0
 qualcomm.perf.cores_online u:object_r:mpdecision_prop:s0
 location.                  u:object_r:location_prop:s0
 qc.izat.                   u:object_r:location_prop:s0

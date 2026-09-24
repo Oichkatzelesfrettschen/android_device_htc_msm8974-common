@@ -11,7 +11,6 @@ qmux_socket(wcnss_service);
 allow wcnss_service wifi_data_file:dir w_dir_perms;
 allow wcnss_service wifi_data_file:file create_file_perms;
 
-set_prop(wcnss_service, system_prop)
 
 allow wcnss_service wifi_vendor_data_file:dir w_dir_perms;
 allow wcnss_service wifi_vendor_data_file:file create_file_perms;

@@ -1,5 +1,4 @@
 get_prop(hal_graphics_composer_default, vendor_hwc_prop)
-get_prop(hal_graphics_composer_default, system_prop)
 
 # The gralloc client probes vndservicemanager for an AIDL allocator this
 # device does not ship before it falls back to the HIDL 2.0 allocator.

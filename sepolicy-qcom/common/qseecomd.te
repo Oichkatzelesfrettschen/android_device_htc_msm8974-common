@@ -60,7 +60,7 @@ allow tee sysfs_securetouch:file rw_file_perms;
 binder_call(tee, surfaceflinger)
 #binder_use(tee)
 
-set_prop(tee, system_prop);
+set_prop(tee, vendor_tee_prop)
 
 
 userdebug_or_eng(`

@@ -1,1 +1,6 @@
 get_prop(netmgrd, vendor_qcom_data_prop)
+
+# netmgrd publishes each interface address as net.<iface>.<field>
+# (netmgr_kif_set_addr_prop); the platform owns net.* and resolves DNS
+# through netd, so the store fails and netmgrd logs it and continues.
+dontaudit netmgrd { net_radio_prop system_prop }:property_service set;

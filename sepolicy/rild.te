@@ -3,7 +3,9 @@ allow rild qcril_device:dir rw_dir_perms;
 allow rild qcril_device:file { create_file_perms ioctl };
 
 allow rild vendor_shim_target_file:file { r_file_perms execute map };
-get_prop(rild, system_prop)
+# qcril reads persist.service.adb.enable and persist.sys.usb.config, which the
+# platform owns and vendor code may not read; those reads return empty.
+dontaudit rild system_prop:file r_file_perms;
 get_prop(rild, vendor_qcom_data_prop)
 get_prop(rild, vendor_qcril_prop)
 get_prop(rild, vendor_rild_libpath_prop)
