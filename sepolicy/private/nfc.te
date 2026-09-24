@@ -1,0 +1,4 @@
+# libnfc-nxp runs inside the nfc app process and drives the PN544 through
+# /dev/pn544 (nfc_device): read/write carry the HCI frames and the
+# PN544_SET_PWR ioctl sequences the power and download-mode GPIOs.
+allow nfc nfc_device:chr_file rw_file_perms;
