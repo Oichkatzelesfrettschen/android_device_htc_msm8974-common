@@ -1,4 +1,2 @@
-allow cameraserver mm-qcamerad:unix_dgram_socket sendto;
 
-allow cameraserver mpctl_socket:dir search;
 

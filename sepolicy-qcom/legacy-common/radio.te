@@ -1,5 +1,3 @@
-# Talks to qmuxd via the qmux_radio socket
-qmux_socket(radio)
 
 # Radio apps needs to communicate with ims sockets
 

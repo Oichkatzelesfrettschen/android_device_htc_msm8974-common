@@ -1,10 +1,4 @@
-qmux_socket(mediaserver)
-
-unix_socket_send(mediaserver, camera, mm-qcamerad)
-
-allow mediaserver mpctl_socket:dir r_dir_perms;
-unix_socket_send(mediaserver, mpctl, mpdecision)
-unix_socket_connect(mediaserver, mpctl, mpdecision)
 
 
-allow mediaserver time_daemon:unix_stream_socket connectto;
+
+
