@@ -28,12 +28,6 @@ on fs
 
     setprop sys.usb.ffs.aio_compat 1
 
-# adbd publishes sys.usb.ffs.ready=1 once its functionfs descriptors are
-# written. The function switch rebinds the gadget, and an ffs function that
-# binds into the live gadget after the host configured it leaves dwc3 unable
-# to queue ep0 requests, so every composition with adb switches only after
-# that property, as the configfs rules in init.usb.configfs.rc bind the UDC.
-
 # adb only USB configuration
 # This is the fallback configuration if the
 # USB manager fails to set a standard configuration
@@ -43,8 +37,6 @@ on property:sys.usb.config=adb
     write /sys/class/android_usb/android0/idProduct 0c81
     write /sys/class/android_usb/android0/functions ${sys.usb.config}
     start adbd
-
-on property:sys.usb.ffs.ready=1 && property:sys.usb.config=adb
     write /sys/devices/platform/android_usb/usb_function_switch 2
     setprop sys.usb.state ${sys.usb.config}
 
@@ -55,8 +47,6 @@ on property:sys.usb.config=rndis
 
 on property:sys.usb.config=rndis,adb
     start adbd
-
-on property:sys.usb.ffs.ready=1 && property:sys.usb.config=rndis,adb
     write /sys/devices/platform/android_usb/usb_function_switch 6
     setprop sys.usb.state ${sys.usb.config}
 
@@ -67,8 +57,6 @@ on property:sys.usb.config=mtp
 
 on property:sys.usb.config=mtp,adb
     start adbd
-
-on property:sys.usb.ffs.ready=1 && property:sys.usb.config=mtp,adb
     write /sys/devices/platform/android_usb/usb_function_switch 130
     setprop sys.usb.state ${sys.usb.config}
 
@@ -79,8 +67,6 @@ on property:sys.usb.config=ptp
 
 on property:sys.usb.config=ptp,adb
     start adbd
-
-on property:sys.usb.ffs.ready=1 && property:sys.usb.config=ptp,adb
     write /sys/devices/platform/android_usb/usb_function_switch 262146
     setprop sys.usb.state ${sys.usb.config}
 
@@ -91,8 +77,6 @@ on property:sys.usb.config=accessory
 
 on property:sys.usb.config=accessory,adb
     start adbd
-
-on property:sys.usb.ffs.ready=1 && property:sys.usb.config=accessory,adb
     write /sys/devices/platform/android_usb/usb_function_switch 8194
     setprop sys.usb.state ${sys.usb.config}
 
@@ -103,8 +87,6 @@ on property:sys.usb.config=audio_source
 
 on property:sys.usb.config=audio_source,adb
     start adbd
-
-on property:sys.usb.ffs.ready=1 && property:sys.usb.config=audio_source,adb
     write /sys/devices/platform/android_usb/usb_function_switch 131074
     setprop sys.usb.state ${sys.usb.config}
 
@@ -115,7 +97,5 @@ on property:sys.usb.config=accessory,audio_source
 
 on property:sys.usb.config=accessory,audio_source,adb
     start adbd
-
-on property:sys.usb.ffs.ready=1 && property:sys.usb.config=accessory,audio_source,adb
     write /sys/devices/platform/android_usb/usb_function_switch 139266
     setprop sys.usb.state ${sys.usb.config}
