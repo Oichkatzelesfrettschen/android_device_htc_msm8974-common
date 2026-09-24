@@ -16,6 +16,25 @@ on post-fs-data
     restorecon /data/misc/cw_calibrator_mag.ini
     restorecon /data/misc/AccOffset.txt
 
+    # The GNSS HAL's loc_api opens its message queues under
+    # /data/misc/location by hardcoded path.
+    mkdir /data/misc/location 0770 gps gps
+    mkdir /data/misc/location/gpsone_d 0770 system gps
+    mkdir /data/misc/location/gsiff 0770 gps gps
+    mkdir /data/misc/location/mq 0770 gps gps
+    mkdir /data/misc/location/quipc 0770 gps system
+    mkdir /data/misc/location/xtwifi 0770 gps gps
+
+    # time_daemon keeps its RTC offset in /data/time.
+    mkdir /data/time 0700 system system
+
+    # mpdecision serves its mpctl socket from /data/misc/perfd and keeps
+    # its saved tunables in /data/system/perfd.
+    mkdir /data/misc/perfd 0755 root system
+    chmod 2755 /data/misc/perfd
+    mkdir /data/system/perfd 0770 root system
+    chmod 2770 /data/system/perfd
+
 # The swcodec APEX carries a linker config that resolves its HAL clients
 # through namespaces this device's legacy blobs do not satisfy; the system
 # copy replaces it once apexd has activated the APEX.

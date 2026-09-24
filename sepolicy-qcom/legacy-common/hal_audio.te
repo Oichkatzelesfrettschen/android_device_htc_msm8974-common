@@ -1,5 +1,3 @@
 # Allow socket communication with perfd
 
 # Allow socket creation for audio arbitration
-allow hal_audio audio_data_file:sock_file { create setattr unlink };
-allow hal_audio audio_data_file:dir remove_name;

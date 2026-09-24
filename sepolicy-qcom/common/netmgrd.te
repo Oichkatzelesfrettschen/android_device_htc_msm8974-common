@@ -11,7 +11,6 @@ userdebug_or_eng(`
 ')
 
 #Allow files to be written during the operation of netmgrd
-file_type_auto_trans(netmgrd, system_data_file, data_test_data_file)
 
 #Allow netmgrd operations
 allow netmgrd netmgrd:capability {
@@ -31,7 +30,7 @@ allow netmgrd netmgrd_data_file:dir w_dir_perms;
 
 #Allow netutils usage
 use_netutils(netmgrd)
-allow netutils_wrapper netmgrd_data_file:file rw_file_perms;
+allow netutils_wrapper netmgrd_data_file:file { getattr read write append ioctl };
 allow netmgrd netutils_wrapper:process sigkill;
 
 #Allow operations on different types of sockets

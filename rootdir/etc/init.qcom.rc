@@ -54,12 +54,6 @@ on fs
     mount none /system/etc/gps.conf /system/etc/gps_debug.conf bind
 
 on post-fs-data
-    # Create directories for tombstones
-    mkdir /data/tombstones/modem 0771 system system
-    mkdir /data/tombstones/lpass 0771 system system
-    mkdir /data/tombstones/wcnss 0771 system system
-    mkdir /data/tombstones/dsps 0771 system system
-
     # Radio permissions
     mkdir /dev/radio 0770 radio radio
 
@@ -67,17 +61,6 @@ on post-fs-data
     mkdir /data/vendor/wifi 0770 wifi wifi
     mkdir /data/vendor/wifi/wpa 0770 wifi wifi
     mkdir /data/vendor/wifi/wpa/sockets 0770 wifi wifi
-
-    # Create the directory used by CnE subsystem
-    mkdir /data/connectivity 0771 system system
-    chown system system /data/connectivity
-
-    # Create directory used by audio subsystem
-    mkdir /data/misc/audio 0770 audio audio
-
-    # Create directories for camera
-    mkdir /data/camera 0770 media camera
-    mkdir /data/misc/camera 0770 camera camera
 
     # Chown polling nodes as needed from UI running on system server
     chown system system /sys/devices/platform/msm_sdcc.1/polling
@@ -90,42 +73,7 @@ on post-fs-data
     chmod 0664 /sys/devices/platform/msm_sdcc.3/polling
     chmod 0664 /sys/devices/platform/msm_sdcc.4/polling
 
-    # NFC local data and nfcee xml storage
-    mkdir /data/nfc 0770 nfc nfc
-    mkdir /data/nfc/param 0770 nfc nfc
-
-    # Create directories for Location services
-    mkdir /data/misc/location 0770 gps gps
-    mkdir /data/misc/location/gpsone_d 0770 system gps
-    mkdir /data/misc/location/gsiff 0770 gps gps
-    mkdir /data/misc/location/mq 0770 gps gps
-    mkdir /data/misc/location/quipc 0770 gps system
-    mkdir /data/misc/location/xtwifi 0770 gps gps
-
-    # Create directory for IMS services
-    mkdir /data/shared 0755 system system
-
-    # Create directory for time-services
-    mkdir /data/time/ 0700 system system
-
-    # Create directory for TZ Apps
-    mkdir /data/misc/qsee 0770 system system
-
-    mkdir /data/audio/ 0775 media audio
-    # Enable the setgid bit on the directory
-    chmod 2775 /data/audio
-
-    mkdir /data/misc/sms 0770 system radio
     mkdir /data/vendor/sensors 0770 system system
-
-    # Create a folder for SRS to be able to create a usercfg file
-    mkdir /data/data/media 0770 media media
-
-    # Create perfd deamon related dirs
-    mkdir /data/misc/perfd 0755 root system
-    chmod 2755 /data/misc/perfd
-    mkdir /data/system/perfd 0770 root system
-    chmod 2770 /data/system/perfd
 
     setprop vold.post_fs_data_done 1
 
