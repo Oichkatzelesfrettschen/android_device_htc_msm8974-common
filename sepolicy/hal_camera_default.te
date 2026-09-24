@@ -16,3 +16,5 @@ dontaudit hal_camera_default persist_debug_prop:file r_file_perms;
 # allocator before the HIDL one; both fall back when denied.
 dontaudit hal_camera_default radio_prop:file r_file_perms;
 dontaudit hal_camera_default default_android_vndservice:service_manager find;
+# The HAL reads /proc/version when it opens a camera.
+allow hal_camera_default proc_version:file r_file_perms;
