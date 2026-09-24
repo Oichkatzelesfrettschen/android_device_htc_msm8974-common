@@ -10,7 +10,6 @@
 /dev/socket/ims_rtpd                                                          u:object_r:ims_socket:s0
 
 # Port bridge
-/data/misc/port_bridge(/.*)?                                                  u:object_r:port_bridge_data_file:s0
 
 # IPA
 /data/misc/ipa(/.*)?                                                          u:object_r:ipacm_data_file:s0

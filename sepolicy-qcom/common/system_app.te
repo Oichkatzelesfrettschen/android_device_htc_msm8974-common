@@ -115,7 +115,6 @@ allow system_app qti_logkit_priv_socket:dir r_dir_perms;
 #allow system_app qti_logkit_priv_socket:sock_file r_file_perms;
 
 # iwconfig
-allow system_app wcnss_service_exec:file rx_file_perms;
 
 # bugreport
 set_prop(system_app, ctl_dumpstate_prop)

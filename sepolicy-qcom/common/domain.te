@@ -1,11 +1,11 @@
-r_dir_file(domain, sysfs_socinfo);
-r_dir_file(domain, sysfs_esoc);
-r_dir_file(domain, sysfs_ssr);
+r_dir_file({ domain -isolated_app_all }, sysfs_socinfo);
+r_dir_file({ domain -isolated_app_all }, sysfs_esoc);
+r_dir_file({ domain -isolated_app_all }, sysfs_ssr);
 
 dontaudit domain kernel:system module_request;
 
 # Allow all domains read access to sysfs_thermal
-r_dir_file(domain, sysfs_thermal);
+r_dir_file({ domain -isolated_app_all }, sysfs_thermal);
 
 # Allow domain to read /vendor -> /system/vendor
 allow domain system_file:lnk_file getattr;
@@ -19,7 +19,7 @@ userdebug_or_eng(`
 allow domain hal_graphics_composer:fd use;
 ')
 
-allow domain sysfs_kgsl_gpuclk:file r_file_perms;
-allow domain  sysfs_kgsl_gpuclk:lnk_file r_file_perms;
+allow { domain -isolated_app_all } sysfs_kgsl_gpuclk:file r_file_perms;
+allow { domain -isolated_app_all } sysfs_kgsl_gpuclk:lnk_file r_file_perms;
 allow domain qti_debugfs:dir search;
 allow domain kgsl_debugfs:dir search;
