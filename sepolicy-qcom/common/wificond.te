@@ -32,4 +32,3 @@ allow wificond wifi_vendor_data_file:file create_file_perms;
 allowxperm wificond self:udp_socket ioctl { SIOCBRADDBR SIOCBRDELBR SIOCGIFHWADDR };
 
 #allow wificond to read FST properties
-get_prop(wificond, fst_prop);

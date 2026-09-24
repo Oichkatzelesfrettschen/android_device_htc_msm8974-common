@@ -37,10 +37,5 @@ userdebug_or_eng(`
     diag_use(surfaceflinger)
 ')
 
-allow surfaceflinger {
-    debug_gralloc_prop
-    sdm_idle_time_prop
-}:file r_file_perms;
 
 #set qemu.gles prop
-set_prop(surfaceflinger, qemu_gles_prop)

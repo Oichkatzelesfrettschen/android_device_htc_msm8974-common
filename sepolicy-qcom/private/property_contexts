@@ -25,6 +25,5 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-persist.vendor.dpm.        u:object_r:persist_dpm_prop:s0
 vendor.bluetooth.          u:object_r:bluetooth_prop:s0
 vendor.qcom.bluetooth.     u:object_r:bluetooth_prop:s0

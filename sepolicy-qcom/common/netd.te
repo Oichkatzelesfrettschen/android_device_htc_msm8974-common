@@ -15,7 +15,6 @@ hal_client_domain(netd, wifidisplayhalservice);
 allowxperm netd self: { unix_stream_socket } ioctl priv_sock_ioctls;
 
 # needed for netd to start FST Manager via system property
-set_prop(netd, netd_prop)
 
 allow netd self:capability fsetid;
 #allow netd hostapd:unix_dgram_socket sendto;

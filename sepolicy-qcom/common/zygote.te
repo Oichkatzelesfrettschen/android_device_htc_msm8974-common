@@ -25,9 +25,6 @@
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-allow zygote debug_gralloc_prop:file r_file_perms;
 # persist.service.bdroid.bdaddr hw.cabl.level
 #set_prop(zygote, bluetooth_prop)
-set_prop(zygote, ppd_prop)
 set_prop(zygote, system_prop)
-set_prop(zygote, qemu_gles_prop)

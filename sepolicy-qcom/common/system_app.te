@@ -29,8 +29,6 @@ r_dir_file(system_app, bluetooth_data_file);
 r_dir_file(system_app, bt_firmware_file);
 
 set_prop(system_app, ctl_default_prop)
-set_prop(system_app, fm_prop)
-set_prop(system_app, usf_prop)
 
 allow system_app {
     atfwd_service
@@ -59,7 +57,6 @@ userdebug_or_eng(`
   allow system_app ssr_ramdump_data_file:file r_file_perms;
 
   # allow system app to read crash_prop
-  allow system_app crash_prop:file r_file_perms;
 ')
 
 allow system_app cnd_data_file:dir w_dir_perms;
@@ -82,7 +79,6 @@ allow system_app usf_data_file:{ file lnk_file } create_file_perms;
 hal_client_domain(system_app, hal_hbtp)
 
 #access to wifi_ftmd
-set_prop(system_app, wififtmd_prop)
 #unix_socket_send(system_app, wififtmd, wifi_ftmd)
 
 # allow system_app to interact with dtseagleservice
@@ -156,7 +152,6 @@ allow system_app radio_data_file:dir rw_dir_perms;
 allow system_app radio_data_file:file create_file_perms;
 
 # DOLBY_START
-set_prop(system_app, dolby_prop)
 # DOLBY_END
 
 allow system_app persist_file:dir rw_dir_perms;
@@ -185,7 +180,6 @@ allow system_app system_data_file:dir read;
 hal_client_domain(system_app, hal_qteeconnector);
 
 #allow system_app access boot mode switch
-set_prop(system_app, boot_mode_prop);
 
 # allow access to cache recovery for LK3
 allow system_app cache_file:dir create_dir_perms;

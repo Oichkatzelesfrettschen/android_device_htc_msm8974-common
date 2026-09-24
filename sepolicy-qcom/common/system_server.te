@@ -36,9 +36,6 @@ allow system_server qtitetherservice_service:service_manager find;
 
 #For ANT tty communication and to set wc_transport prop
 set_prop(system_server, bluetooth_prop)
-set_prop(system_server, usf_prop)
-set_prop(system_server, alarm_handled_prop)
-set_prop(system_server, alarm_instance_prop)
 
 # required for ANT App to connectto wcnss_filter sockets
 allow system_server bluetooth:unix_stream_socket connectto;
@@ -61,7 +58,6 @@ allow system_server location_data_file:dir create_dir_perms;
 allow system_server { location_app_data_file mdtp_svc_app_data_file } :file rw_file_perms;
 allow system_server { location_app_data_file mdtp_svc_app_data_file } :dir r_dir_perms;
 #allow system_server location_socket:sock_file create_file_perms;
-set_prop(system_server, location_prop)
 
 #For wifistatemachine
 allow system_server kernel:key search;
@@ -100,7 +96,6 @@ allow system_server usf_data_file:file r_file_perms;
 allow system_server usf_data_file:lnk_file create_file_perms;
 allow system_server usf_data_file:fifo_file w_file_perms;
 
-get_prop(system_server, xlat_prop)
 
 # For WFD
 allow system_server graphics_device:dir r_dir_perms;
@@ -120,7 +115,6 @@ allow system_server imshelper_app_data_file:dir r_dir_perms;
 # So init can manage our process
 
 #Rules for system server to talk to peripheral manager
-get_prop(system_server, per_mgr_state_prop);
 
 # Allow system server access to qfp daemon
 allow system_server iqfp_service:service_manager find;
@@ -132,9 +126,6 @@ set_prop(system_server, ctl_bootanim_prop)
 r_dir_file(system_server, dhcp_data_file)
 
 # Allow system server to access fst,wigig system properties
-set_prop(system_server, fst_prop)
-get_prop(system_server, fst_prop);
-set_prop(system_server, wigig_prop);
 
 #allow access to fingerprintd data file
 allow system_server fingerprintd_data_file:file { r_file_perms unlink };
@@ -155,15 +146,9 @@ allow system_server sysfs_graphics:file rw_file_perms;
 
 # timerslack_ns
 allow system_server system_app:file write;
-allow system_server opengles_prop:file r_file_perms;
-allow system_server graphics_vulkan_prop:file r_file_perms;
 
-allow system_server hwui_prop:file r_file_perms;
-allow system_server bservice_prop:file r_file_perms;
-allow system_server reschedule_service_prop:file r_file_perms;
 allow system_server appdomain:file w_file_perms;
 
-get_prop(system_server, vendor_mpctl_prop)
 
 # IPC call for sensor feed
 binder_call(system_server, hal_camera)
