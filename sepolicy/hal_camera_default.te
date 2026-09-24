@@ -15,3 +15,7 @@ allow hal_camera_default vendor_textrel_file:file { r_file_perms execute map exe
 allow hal_camera_default time_helper_device:chr_file r_file_perms;
 # QCamera2 probes optional persist.debug.* switches; their defaults apply.
 dontaudit hal_camera_default persist_debug_prop:file r_file_perms;
+# The HAL reads gsm.*operator.numeric for region defaults and probes an AIDL
+# allocator before the HIDL one; both fall back when denied.
+dontaudit hal_camera_default radio_prop:file r_file_perms;
+dontaudit hal_camera_default default_android_vndservice:service_manager find;

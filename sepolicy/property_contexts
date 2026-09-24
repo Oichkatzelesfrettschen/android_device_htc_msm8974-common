@@ -60,3 +60,13 @@ vendor.display.vds_allow_hwc        u:object_r:vendor_qti_probe_prop:s0 exact
 persist.awb.                        u:object_r:camera_prop:s0
 persist.subcam                      u:object_r:camera_prop:s0 exact
 debug.camera.                       u:object_r:camera_prop:s0
+mfg.calibration.                    u:object_r:camera_prop:s0
+mfg.awb.                            u:object_r:camera_prop:s0
+persist.yushanii.                   u:object_r:camera_prop:s0
+persist.capture.burst.exposures     u:object_r:camera_prop:s0 exact
+persist.denoise.process.plates      u:object_r:camera_prop:s0 exact
+persist.iaf.enable                  u:object_r:camera_prop:s0 exact
+sys.camera.4k2k.enable              u:object_r:camera_prop:s0 exact
+ro.product.main_camera              u:object_r:camera_prop:s0 exact
+ro.product.ram                      u:object_r:camera_prop:s0 exact
+ro.build.sense.version              u:object_r:camera_prop:s0 exact
