@@ -1,0 +1,9 @@
+cc_library_shared {
+    name: "android.hardware.health@2.1-impl-htc_msm8974",
+    stem: "android.hardware.health@2.0-impl-2.1-htc_msm8974",
+    vendor: true,
+    recovery_available: true,
+    defaults: ["android.hardware.health@2.1-impl-defaults"],
+    srcs: ["impl.cpp"],
+    cflags: ["-Wall", "-Wextra", "-Werror"],
+}
