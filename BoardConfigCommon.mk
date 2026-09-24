@@ -134,25 +134,28 @@ TARGET_PROVIDES_LIBLIGHT := true
 TARGET_POWERHAL_MODE_EXT := $(PLATFORM_PATH)/power/power-8974.cpp
 
 # SELinux
-# The directories device/qcom/sepolicy-legacy/sepolicy.mk lists, without its
-# include of device/lineage/sepolicy/qcom: that policy renames hal_gnss_qti,
-# sysfs_graphics and other legacy types to vendor_* through
+# sepolicy-qcom carries the qcom legacy vendor policy this device uses,
+# imported from device/qcom/sepolicy-legacy (Ultra-Legacy-Hippeastrum
+# android_device_qcom_sepolicy, lineage-22.2-legacy b1fcf636ddcc). The
+# directories are the ones device/qcom/sepolicy-legacy/sepolicy.mk lists,
+# without its include of device/lineage/sepolicy/qcom: that policy renames
+# hal_gnss_qti, sysfs_graphics and other legacy types to vendor_* through
 # BOARD_SEPOLICY_M4DEFS and references vendor_hal_soter_client, which only
 # the UM-family vendor policy declares. The test directory carries policy for
 # qcom test binaries this device does not ship; ssg stays because
 # common/ssgtzd.te references its ssg_app type.
 BOARD_VENDOR_SEPOLICY_DIRS += \
-    device/qcom/sepolicy-legacy/common \
-    device/qcom/sepolicy-legacy/ssg \
-    device/qcom/sepolicy-legacy/$(TARGET_BOARD_PLATFORM) \
-    device/qcom/sepolicy-legacy/legacy-common \
+    $(PLATFORM_PATH)/sepolicy-qcom/common \
+    $(PLATFORM_PATH)/sepolicy-qcom/ssg \
+    $(PLATFORM_PATH)/sepolicy-qcom/msm8974 \
+    $(PLATFORM_PATH)/sepolicy-qcom/legacy-common \
     $(PLATFORM_PATH)/sepolicy \
     $(PLATFORM_PATH)/sepolicy-minimal
 SYSTEM_EXT_PUBLIC_SEPOLICY_DIRS += \
-    device/qcom/sepolicy-legacy/public \
+    $(PLATFORM_PATH)/sepolicy-qcom/public \
     $(PLATFORM_PATH)/sepolicy/public
 SYSTEM_EXT_PRIVATE_SEPOLICY_DIRS += \
-    device/qcom/sepolicy-legacy/private \
+    $(PLATFORM_PATH)/sepolicy-qcom/private \
     $(PLATFORM_PATH)/sepolicy/private
 BOARD_SEPOLICY_VERS := $(PLATFORM_SDK_VERSION).0
 SELINUX_IGNORE_NEVERALLOWS := true
