@@ -262,6 +262,7 @@ service netmgrd /vendor/bin/netmgrd
     class core
     user root
     group root wifi wakelock radio inet
+    setenv PATH /vendor/bin/netutils:/system/bin:/system/xbin:/vendor/bin:/vendor/xbin
 
 service qcamerasvr /vendor/bin/mm-qcamera-daemon
     class late_start

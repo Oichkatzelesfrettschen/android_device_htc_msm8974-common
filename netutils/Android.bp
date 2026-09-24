@@ -1,0 +1,39 @@
+// The legacy qcom netmgrd runs iptables, ip6tables, tc, ndc and ip by bare name
+// through sh. Its service PATH starts at /vendor/bin/netutils, where these links
+// resolve each name to the system netutils wrapper, so the commands execute in
+// netutils_wrapper against the wrapper's allow list instead of in netmgrd.
+
+install_symlink {
+    name: "netmgrd_netutils_ip",
+    vendor: true,
+    installed_location: "bin/netutils/ip",
+    symlink_target: "/system/bin/ip-wrapper-1.0",
+}
+
+install_symlink {
+    name: "netmgrd_netutils_ip6tables",
+    vendor: true,
+    installed_location: "bin/netutils/ip6tables",
+    symlink_target: "/system/bin/ip6tables-wrapper-1.0",
+}
+
+install_symlink {
+    name: "netmgrd_netutils_iptables",
+    vendor: true,
+    installed_location: "bin/netutils/iptables",
+    symlink_target: "/system/bin/iptables-wrapper-1.0",
+}
+
+install_symlink {
+    name: "netmgrd_netutils_ndc",
+    vendor: true,
+    installed_location: "bin/netutils/ndc",
+    symlink_target: "/system/bin/ndc-wrapper-1.0",
+}
+
+install_symlink {
+    name: "netmgrd_netutils_tc",
+    vendor: true,
+    installed_location: "bin/netutils/tc",
+    symlink_target: "/system/bin/tc-wrapper-1.0",
+}

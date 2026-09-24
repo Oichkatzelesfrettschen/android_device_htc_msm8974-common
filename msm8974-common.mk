@@ -244,6 +244,14 @@ PRODUCT_PACKAGES += \
     libOmxVenc \
     libstagefrighthw
 
+# Netmgrd
+PRODUCT_PACKAGES += \
+    netmgrd_netutils_ip \
+    netmgrd_netutils_ip6tables \
+    netmgrd_netutils_iptables \
+    netmgrd_netutils_ndc \
+    netmgrd_netutils_tc
+
 # Power
 PRODUCT_PACKAGES += \
     android.hardware.power-service-qti \
