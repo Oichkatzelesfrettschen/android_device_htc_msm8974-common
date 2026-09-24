@@ -9,3 +9,8 @@ get_prop(rild, vendor_qcril_prop)
 get_prop(rild, vendor_rild_libpath_prop)
 # SQLite probes F2FS_IOC_GET_FEATURES on qcril.db.
 allowxperm rild qcril_device:file ioctl 0xf50c;
+
+# libril-qc-qmi-1 probes /data/misc/radio/ril_log and
+# validation_result_sub*.xml, debug outputs in a platform directory; RIL_Init
+# completes without them.
+dontaudit rild radio_core_data_file:dir search;
