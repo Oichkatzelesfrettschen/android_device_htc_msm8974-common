@@ -21,6 +21,9 @@ ro.qc.sdk.izat.                     u:object_r:location_prop:s0
 # mpdecision
 ro.qualcomm.perf.cores_online       u:object_r:mpdecision_prop:s0 exact
 
+# Power HAL low-power state, applied by init.qcom.power.rc
+vendor.power.low_power              u:object_r:vendor_power_prop:s0 exact
+
 # Modem data services: netmgrd, qmuxd, rmt_storage, time_daemon, libdsutils
 ro.baseband.arch                    u:object_r:vendor_qcom_data_prop:s0 exact
 ro.use_data_netmgrd                 u:object_r:vendor_qcom_data_prop:s0 exact

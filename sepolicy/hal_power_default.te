@@ -1,0 +1,6 @@
+# Interactive governor boost, boostpulse and boostpulse_duration
+allow hal_power_default sysfs_devices_system_cpu:dir r_dir_perms;
+allow hal_power_default sysfs_devices_system_cpu:file rw_file_perms;
+
+# Low-power state that init.qcom.power.rc applies to the cpu_boost input boost
+set_prop(hal_power_default, vendor_power_prop)

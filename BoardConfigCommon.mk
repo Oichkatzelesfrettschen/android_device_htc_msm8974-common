@@ -131,7 +131,7 @@ PRODUCT_ENFORCE_VINTF_MANIFEST_OVERRIDE := true
 TARGET_PROVIDES_LIBLIGHT := true
 
 # Power
-TARGET_USES_INTERACTION_BOOST := true
+TARGET_POWERHAL_MODE_EXT := $(PLATFORM_PATH)/power/power-8974.cpp
 
 # SELinux
 # The directories device/qcom/sepolicy-legacy/sepolicy.mk lists, without its
