@@ -10,3 +10,8 @@ r_dir_file(hal_camera_default, sysfs_camera_led_status)
 
 # libmmjpeg encodes snapshots in the camera HAL process.
 allow hal_camera_default vendor_textrel_file:file { r_file_perms execute map execmod };
+
+# ueventd.qcom.rc gives /dev/time_helper to group camera; the HAL reads it.
+allow hal_camera_default time_helper_device:chr_file r_file_perms;
+# QCamera2 probes optional persist.debug.* switches; their defaults apply.
+dontaudit hal_camera_default persist_debug_prop:file r_file_perms;

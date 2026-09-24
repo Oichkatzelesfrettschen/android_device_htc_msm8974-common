@@ -71,3 +71,4 @@
 /sys/module/htc_bdaddress/parameters/bdaddress                                       u:object_r:sysfs_bluetooth_writable:s0
 /(vendor|system/vendor)/lib/libmmjpeg\.so                                             u:object_r:vendor_textrel_file:s0
 /(vendor|system/vendor)/lib/libmmcamera_faceproc\.so                                  u:object_r:vendor_textrel_file:s0
+/dev/time_helper                                                                     u:object_r:time_helper_device:s0

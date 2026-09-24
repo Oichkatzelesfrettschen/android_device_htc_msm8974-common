@@ -55,3 +55,8 @@ ro.graphics.memory                  u:object_r:vendor_gpu_prop:s0 exact
 ro.vendor.qti.va_aosp.support       u:object_r:vendor_qti_probe_prop:s0 exact
 vendor.audio.hapticgenerator.distortion.output.gain u:object_r:vendor_qti_probe_prop:s0 exact
 vendor.display.vds_allow_hwc        u:object_r:vendor_qti_probe_prop:s0 exact
+
+# mm-camera tuning and debug switches read by mm-qcamera-daemon
+persist.awb.                        u:object_r:camera_prop:s0
+persist.subcam                      u:object_r:camera_prop:s0 exact
+debug.camera.                       u:object_r:camera_prop:s0
