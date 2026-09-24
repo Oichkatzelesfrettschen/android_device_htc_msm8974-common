@@ -105,7 +105,6 @@
 /dev/socket/qmux_radio(/.*)?                    u:object_r:qmuxd_socket:s0
 /dev/socket/qmux_nfc(/.*)?                      u:object_r:qmuxd_socket:s0
 /dev/socket/netmgr(/.*)?                        u:object_r:netmgrd_socket:s0
-/dev/socket/sensor_ctl_socket                   u:object_r:sensors_socket:s0
 /dev/socket/cnd                                 u:object_r:cnd_socket:s0
 /dev/socket/nims                                u:object_r:cnd_socket:s0
 /dev/socket/thermal-send-client                 u:object_r:thermal_socket:s0
@@ -136,7 +135,6 @@
 /dev/socket/wigignpt                            u:object_r:wigignpt_socket:s0
 /dev/socket/qdma(/.*)?                          u:object_r:qdma_socket:s0
 /dev/socket/mmi                                 u:object_r:mmi_socket:s0
-/dev/socket/location(/.*)?                      u:object_r:location_socket:s0
 
 ###################################
 # System files
@@ -291,7 +289,6 @@
 /sys/devices(/platform)?/soc/[a-z0-9]+\.qcom,vidc/video4linux/video[0-9]+/name(/.*)?   u:object_r:sysfs_graphics:s0
 /sys/devices(/platform)?/soc/[a-z0-9]+\.qcom,cci/[a-z0-9]+\.qcom,cci:qcom,camera@[0-2]/video4linux/video[0-9]+/name(/.*)?   u:object_r:sysfs_graphics:s0
 /sys/bus/platform/drivers/xhci_msm_hsic(/.*)?                       u:object_r:sysfs_hsic:s0
-/sys/devices/msm_hsic_host/host_ready                               u:object_r:sysfs_hsic_host_rdy:s0
 /sys/bus/esoc(/.*)?                                                 u:object_r:sysfs_esoc:s0
 /sys/bus/msm_subsys(/.*)?                                           u:object_r:sysfs_ssr:s0
 /sys/devices(/platform)?/soc/[a-z0-9\.:]+,[a-z0-9\-\_]+/subsys[0-9]+/name         u:object_r:sysfs_ssr:s0
@@ -303,10 +300,6 @@
 /sys/bus/msm_subsys/devices/subsys4/restart_level                   u:object_r:sysfs_ssr_toggle:s0
 /sys/devices/soc0/.*                                                u:object_r:sysfs_socinfo:s0
 /sys/devices/soc/soc:qcom,ipa_fws@[a-f0-9]+/subsys0/name            u:object_r:sysfs_data:s0
-/sys/devices/soc/soc:hbtp/secure_touch                              u:object_r:hbtp_kernel_sysfs:s0
-/sys/devices/soc/soc:hbtp/secure_touch_enable                       u:object_r:hbtp_kernel_sysfs:s0
-/sys/devices/soc/soc:hbtp/secure_touch_userspace                    u:object_r:hbtp_kernel_sysfs:s0
-/sys/kernel/hbtp/display_pwr                                        u:object_r:hbtp_kernel_sysfs:s0
 /sys/firmware/devicetree/base/cpus(/.*)?                            u:object_r:sysfs_devices_system_cpu:s0
 /sys/devices/vendor/vendor:bt_wcn3990/extldo                        u:object_r:sysfs_bluetooth_writable:s0
 /sys/devices/vendor/vendor:bt_wcn3990/rfkill/rfkill0/state          u:object_r:sysfs_bluetooth_writable:s0
@@ -358,9 +351,7 @@
 ###################################
 # data files
 #
-/data/connectivity(/.*)?                                            u:object_r:cnd_data_file:s0
 /data/vendor/nfc(/.*)?                                              u:object_r:nfc_vendor_data_file:s0
-/data/vendor/connectivity(/.*)?                                     u:object_r:cnd_data_file:s0
 /data/data_test(/.*)?                                               u:object_r:data_test_data_file:s0
 /data/diag_log(/.*)?                                                u:object_r:diag_data_file:s0
 /data/misc/sensors(/.*)?                                            u:object_r:sensors_data_file:s0
@@ -382,25 +373,14 @@
 /data/vendor/qtee(/.*)?                                             u:object_r:data_qtee_file:s0
 /data/misc/spss(/.*)?                                               u:object_r:spss_data_file:s0
 /data/vendor/location(/.*)?                                         u:object_r:location_data_file:s0
-/data/vendor/location/mq/location-mq-s                              u:object_r:location_socket:s0
-/data/vendor/location/mq/alarm_svc                                  u:object_r:location_socket:s0
-/data/vendor/location/xtra/socket_xtra                              u:object_r:location_socket:s0
-/data/vendor/location/xtra/socket_hal_xtra                          u:object_r:location_socket:s0
-/data/FTM_AP(/.*)?                                                  u:object_r:mmi_data_file:s0
 /data/(misc|vendor)/hbtp(/.*)?                                      u:object_r:hbtp_log_file:s0
 /data/misc/qlogd(/.*)?                                              u:object_r:qlogd_data_file:s0
-/data/usf(/.*)?                                                     u:object_r:usf_data_file:s0
-/data/misc/dts(/.*)?                                                u:object_r:dts_data_file:s0
-/data/vendor/qti-logkit(/.*)?                                       u:object_r:qti_logkit_priv_data_file:s0
-/data/vendor/qti-logkit/shared-public(/.*)?                         u:object_r:qti_logkit_pub_data_file:s0
-/data/vendor/qti-logkit/logdata(/.*)?                               u:object_r:qti_logkit_pub_data_file:s0
 /data/vendor/qti-logkit/socket-privileged(/.*)?                     u:object_r:qti_logkit_priv_socket:s0
 /data/vendor/qti-logkit/socket-public(/.*)?                         u:object_r:qti_logkit_pub_socket:s0
 /data/vendor/radio(/.*)?                                            u:object_r:vendor_radio_data_file:s0
 /data/vendor/netmgr(/.*)?                                           u:object_r:netmgrd_data_file:s0
 /data/vendor/port_bridge(/.*)?                                      u:object_r:port_bridge_data_file:s0
 /data/misc/fm(/.*)?                                                 u:object_r:fm_data_file:s0
-/data/misc/audio_pp(/.*)?                                           u:object_r:audio_pp_data_file:s0
 /data/ramdump(/.*)?                                                 u:object_r:ssr_ramdump_data_file:s0
 /data/system/swap(/.*)?                                             u:object_r:swap_data_file:s0
 /data/vendor/wifi(/.*)?                                             u:object_r:wifi_vendor_data_file:s0
@@ -457,7 +437,6 @@
 ###################################
 # cache files
 #
-/cache/FTM_AP(/.*)?                                                 u:object_r:mmi_data_file:s0
 
 ###################################
 # vendor files

@@ -59,21 +59,15 @@ userdebug_or_eng(`
   # allow system app to read crash_prop
 ')
 
-allow system_app cnd_data_file:dir w_dir_perms;
-allow system_app cnd_data_file:file create_file_perms;
 allow system_app bluetooth:unix_stream_socket ioctl;
 
 # access to tee domain
 #allow system_app tee:unix_dgram_socket sendto;
 
 # system app to access DTS data files
-r_dir_file(system_app, dts_data_file)
 
 # usf (ultrasound) apps need following permissions
 #allow system_app usf:unix_stream_socket connectto;
-allow system_app usf_data_file:sock_file write;
-allow system_app usf_data_file:dir rw_dir_perms;
-allow system_app usf_data_file:{ file lnk_file } create_file_perms;
 
 # Allow hbtp hal Service to be found
 hal_client_domain(system_app, hal_hbtp)
@@ -111,16 +105,11 @@ hal_client_domain(system_app, hal_display_postproc)
 hal_client_domain(system_app, hal_light);
 
 #allow access to RIDL
-allow system_app RIDL_data_file:dir rw_dir_perms;
-allow system_app RIDL_data_file:file create_file_perms;
-allow system_app RIDL_data_file:lnk_file r_file_perms;
 allow system_app RIDL_socket:dir r_dir_perms;
 #unix_socket_connect(system_app, RIDL, RIDL)
 #allow system_app RIDL_socket:sock_file r_file_perms;
 
 # Allow access to qti_logkit
-allow system_app qti_logkit_priv_data_file:dir create_dir_perms;
-allow system_app qti_logkit_priv_data_file:file create_file_perms;
 allow system_app qti_logkit_priv_socket:dir r_dir_perms;
 #unix_socket_connect(system_app, qti_logkit_priv, qti_logkit)
 #allow system_app qti_logkit_priv_socket:sock_file r_file_perms;
@@ -145,7 +134,6 @@ allow system_app self:netlink_kobject_uevent_socket { read bind setopt create };
 # allow system_app to interact with mdtp daemon
 
 # allow access to system_app for audio pp files
-r_dir_file(system_app, audio_pp_data_file);
 
 # allow access to system app for radio files
 allow system_app radio_data_file:dir rw_dir_perms;
@@ -188,8 +176,6 @@ allow system_app cache_recovery_file:dir rw_dir_perms;
 allow system_app cache_recovery_file:file create_file_perms;
 
 #Allow system app access mmi_data_file
-allow system_app mmi_data_file:dir create_dir_perms;
-allow system_app mmi_data_file:file create_file_perms;
 
 # update engine
 binder_call( system_app, update_engine )

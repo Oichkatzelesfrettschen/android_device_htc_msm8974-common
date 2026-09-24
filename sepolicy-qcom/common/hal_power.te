@@ -26,6 +26,4 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 hal_client_domain(hal_power_default, hal_perf)
-allow hal_power {
-    hbtp_kernel_sysfs
-}:file rw_file_perms;
+

@@ -6,9 +6,7 @@ netmgr_socket(system_server)
 qmux_socket(system_server)
 
 allow system_server sensors_device:chr_file getattr;
-allow system_server sensors_socket:sock_file r_file_perms;
 
-allow system_server location_socket:sock_file create_file_perms;
 
 
 
