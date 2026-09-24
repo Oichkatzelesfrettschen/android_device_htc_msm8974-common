@@ -6,3 +6,6 @@ r_dir_file(mm-qcamerad, sysfs_camera_awb_cal)
 r_dir_file(mm-qcamerad, sysfs_camera_sensor)
 r_dir_file(mm-qcamerad, sysfs_flashlight)
 r_dir_file(mm-qcamerad, sysfs_leds)
+
+# libmmcamera_faceproc runs face detection in the camera daemon.
+allow mm-qcamerad vendor_textrel_file:file { r_file_perms execute map execmod };
