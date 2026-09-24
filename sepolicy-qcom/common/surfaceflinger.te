@@ -8,9 +8,7 @@ allow surfaceflinger persist_display_file:file create_file_perms;
 allow surfaceflinger persist_file:dir search;
 
 # Use open file provided by poweroffhandler
-binder_call(surfaceflinger, poweroffhandler);
 
-binder_call(surfaceflinger, location)
 binder_call(surfaceflinger, tee)
 
 hal_client_domain(surfaceflinger, hal_display_config)
@@ -25,7 +23,6 @@ allow surfaceflinger display_vendor_data_file:file create_file_perms;
 r_dir_file(surfaceflinger, firmware_file)
 
 #Allow access to fastmmi
-binder_call(surfaceflinger, mmi)
 
 #Allow access to cameraserver service
 allow surfaceflinger cameraserver_service:service_manager find;

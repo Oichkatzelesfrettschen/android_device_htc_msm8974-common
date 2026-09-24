@@ -2,6 +2,5 @@
 qmux_socket(radio)
 
 # Radio apps needs to communicate with ims sockets
-unix_socket_connect(radio, ims, ims)
 
 allow radio self:socket create_socket_perms_no_ioctl;

@@ -22,7 +22,6 @@ userdebug_or_eng(`
 #Communicate with user land process through domain socket
 #allow mm-qcamerad camera_socket:sock_file { create unlink write };
 allow mm-qcamerad camera_socket:dir w_dir_perms;
-unix_socket_connect(mm-qcamerad, sensors, sensors)
 
 #Allow connections between sensor manager and mm-qcamerad
 #allow mm-qcamerad system_server:unix_stream_socket rw_socket_perms;
@@ -64,7 +63,6 @@ allow mm-qcamerad graphics_device:dir r_dir_perms;
 allow mm-qcamerad graphics_device:chr_file rw_file_perms;
 
 #Allow camera work normally in FFBM
-binder_call(mm-qcamerad, mmi);
 
 #Allow camera to access laser nodes
 allow mm-qcamerad input_device:dir r_dir_perms;

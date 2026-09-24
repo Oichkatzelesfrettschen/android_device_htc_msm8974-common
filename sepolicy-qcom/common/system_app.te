@@ -86,31 +86,24 @@ set_prop(system_app, wififtmd_prop)
 #unix_socket_send(system_app, wififtmd, wifi_ftmd)
 
 # allow system_app to interact with dtseagleservice
-binder_call(system_app, dtseagleservice)
 
 # allow system_app to interact with fido daemon
-binder_call(system_app, fidodaemon)
 
 # allow system_app to interact with secota daemon
-binder_call(system_app, secotad)
 
 #allow access to qfp-daemon
 allow system_app qfp-daemon_data_file:dir create_dir_perms;
 allow system_app qfp-daemon_data_file:file create_file_perms;
-binder_call(system_app, qfp-daemon)
 hal_client_domain(system_app, hal_fingerprint)
 
 #allow access to qvop-daemon
 hal_client_domain(system_app, hal_voiceprint)
 
 # allow system_app to interact with fido daemon
-binder_call(system_app, fidodaemon)
 
 # allow system_app to interact with esepmdaemon
-binder_call(system_app, esepmdaemon)
 
 # allow system_app to interact with seemp health daemon
-binder_call(system_app, seemp_health_daemon)
 
 # allow system_app to interact with display color hal
 hal_client_domain(system_app, hal_display_color)
@@ -154,7 +147,6 @@ allow system_app wbc_service:service_manager add;
 allow system_app self:netlink_kobject_uevent_socket { read bind setopt create };
 
 # allow system_app to interact with mdtp daemon
-binder_call(system_app, mdtpdaemon)
 
 # allow access to system_app for audio pp files
 r_dir_file(system_app, audio_pp_data_file);

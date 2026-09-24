@@ -141,12 +141,10 @@ TARGET_POWERHAL_MODE_EXT := $(PLATFORM_PATH)/power/power-8974.cpp
 # without its include of device/lineage/sepolicy/qcom: that policy renames
 # hal_gnss_qti, sysfs_graphics and other legacy types to vendor_* through
 # BOARD_SEPOLICY_M4DEFS and references vendor_hal_soter_client, which only
-# the UM-family vendor policy declares. The test directory carries policy for
-# qcom test binaries this device does not ship; ssg stays because
-# common/ssgtzd.te references its ssg_app type.
+# the UM-family vendor policy declares. sepolicy-qcom keeps the domains
+# whose executables or apps this device ships.
 BOARD_VENDOR_SEPOLICY_DIRS += \
     $(PLATFORM_PATH)/sepolicy-qcom/common \
-    $(PLATFORM_PATH)/sepolicy-qcom/ssg \
     $(PLATFORM_PATH)/sepolicy-qcom/msm8974 \
     $(PLATFORM_PATH)/sepolicy-qcom/legacy-common \
     $(PLATFORM_PATH)/sepolicy \

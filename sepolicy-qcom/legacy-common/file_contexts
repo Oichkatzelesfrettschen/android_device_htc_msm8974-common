@@ -1,5 +1,4 @@
 # Perfd
-/(vendor|system/vendor)/bin/perfd                                             u:object_r:perfd_exec:s0
 /data/system/perfd(/.*)?                                                      u:object_r:mpctl_data_file:s0
 /dev/socket/perfd                                                             u:object_r:mpctl_socket:s0
 /data/misc/perfd(/.*)?                                                        u:object_r:mpctl_socket:s0
@@ -10,7 +9,6 @@
 /data/misc/location/mq/alarm_svc                                              u:object_r:location_socket:s0
 
 # IMS
-/(vendor|system/vendor)/bin/imscmservice                                      u:object_r:ims_exec:s0
 /dev/socket/ims_rtpd                                                          u:object_r:ims_socket:s0
 
 # Port bridge
@@ -80,6 +78,7 @@
 
 # Bluetooth
 /(vendor|system/vendor)/bin/hci_qcomm_init                                    u:object_r:bluetooth_loader_exec:s0
+/(vendor|system/vendor)/bin/init\.qcom\.bt\.sh                                  u:object_r:bluetooth_loader_exec:s0
 /sys/devices/bt_qca6174\.[0-9]+/extldo                                        u:object_r:sysfs_bluetooth_writable:s0
 /sys/devices/bt_qca6174\.[0-9]+/rfkill/rfkill0/state                          u:object_r:sysfs_bluetooth_writable:s0
 

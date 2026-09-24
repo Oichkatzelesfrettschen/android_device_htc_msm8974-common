@@ -53,7 +53,6 @@ unix_socket_connect(system_server, iop, dumpstate)
 #allow system_server dpmd_data_file:file create_file_perms;
 
 # For location
-binder_call(system_server, location);
 type_transition system_server location_data_file:sock_file location_socket "location-mq-s";
 type_transition system_server location_data_file:sock_file location_socket "alarm_svc";
 #allow system_server location:unix_stream_socket connectto;
@@ -94,7 +93,6 @@ r_dir_file(system_server, firmware_file)
 #allow system_server wcnss_filter:unix_stream_socket connectto;
 
 # Allow system server access to usf resources
-allow system_server usf:process signal;
 #allow system_server usf:unix_stream_socket connectto;
 allow system_server usf_data_file:sock_file write;
 allow system_server usf_data_file:dir rw_dir_perms;
@@ -118,19 +116,13 @@ allow system_server imshelper_app_data_file:dir r_dir_perms;
 #Allow access to netmgrd socket
 #netmgr_socket(system_server);
 # So init can manage our process
-allow system_server RIDL:fd use;
-allow system_server RIDL:fifo_file write;
 
 # So init can manage our process
-allow system_server qti_logkit:fd use;
-allow system_server qti_logkit:fifo_file write;
 
 #Rules for system server to talk to peripheral manager
 get_prop(system_server, per_mgr_state_prop);
 
 # Allow system server access to qfp daemon
-binder_call(system_server, qfp-daemon);
-binder_call(system_server, fps_hal)
 allow system_server iqfp_service:service_manager find;
 
 # For shutdown animation
@@ -162,7 +154,7 @@ userdebug_or_eng(`
 allow system_server sysfs_graphics:file rw_file_perms;
 
 # timerslack_ns
-allow system_server { location_app system_app } :file write;
+allow system_server system_app:file write;
 allow system_server opengles_prop:file r_file_perms;
 allow system_server graphics_vulkan_prop:file r_file_perms;
 
@@ -174,7 +166,6 @@ allow system_server appdomain:file w_file_perms;
 get_prop(system_server, vendor_mpctl_prop)
 
 # IPC call for sensor feed
-binder_call(system_server, mm-pp-daemon)
 binder_call(system_server, hal_camera)
 binder_call(system_server, mm-qcamerad)
 

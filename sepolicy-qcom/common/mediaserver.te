@@ -28,7 +28,6 @@ allow mediaserver dts_data_file:dir rw_dir_perms;
 allow mediaserver dts_data_file:file create_file_perms;
 
 # allow poweroffhandler to binder mediaserver
-binder_call(mediaserver, poweroffhandler);
 
 
 # for thermal sock files
@@ -55,7 +54,6 @@ set_prop(mediaserver, camera_prop)
 allow mediaserver mmi_data_file:file r_file_perms;
 
 #allow mediaserver to access wfdservice
-binder_call(mediaserver, wfdservice)
 
 #allow mediaserver to access adsprpcd
 r_dir_file(mediaserver, adsprpcd_file);

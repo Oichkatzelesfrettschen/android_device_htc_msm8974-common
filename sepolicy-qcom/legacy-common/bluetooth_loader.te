@@ -5,7 +5,6 @@ type bluetooth_loader_exec, exec_type, file_type;
 init_daemon_domain(bluetooth_loader)
 
 # Execute init.qcom.bt.sh
-allow bluetooth_loader qti_init_shell_exec:file entrypoint;
 
 # Run hci_qcomm_init and log without changing domain
 allow bluetooth_loader bluetooth_loader_exec:file execute_no_trans;

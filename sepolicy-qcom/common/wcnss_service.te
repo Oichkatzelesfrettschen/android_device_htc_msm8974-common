@@ -30,7 +30,6 @@ allow wcnss_service smem_log_device:chr_file rw_file_perms;
 allow wcnss_service proc_net:file rw_file_perms;
 
 # allow wpa_supplicant to send back wifi information to cnd
-allow wcnss_service cnd:unix_dgram_socket sendto;
 allow wcnss_service self:capability {
     net_admin
     net_bind_service
@@ -47,7 +46,6 @@ allow wcnss_service sysfs_net:file rw_file_perms;
 allow wcnss_service sysfs_net:dir r_dir_perms;
 
 # allow access to network performance tuner
-unix_socket_connect(wcnss_service, wigignpt, wigignpt)
 
 userdebug_or_eng(`
 allow wcnss_service fuse:dir create_dir_perms;
@@ -69,7 +67,7 @@ diag_use(wcnss_service)
 ')
 
 #binder_use(wcnss_service)
-use_per_mgr(wcnss_service)
+vndbinder_use(wcnss_service)
 
 hwbinder_use(wcnss_service)
 get_prop(wcnss_service, hwservicemanager_prop)
