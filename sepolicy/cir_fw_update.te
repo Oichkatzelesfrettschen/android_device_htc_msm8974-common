@@ -1,5 +1,5 @@
 type cir_fw_update, domain;
-type cir_fw_update_exec, exec_type, file_type;
+type cir_fw_update_exec, exec_type, vendor_file_type, file_type;
 
 # Started by init
 init_daemon_domain(cir_fw_update)
