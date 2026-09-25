@@ -25,6 +25,12 @@ on post-fs-data
     mkdir /data/misc/location/quipc 0770 gps system
     mkdir /data/misc/location/xtwifi 0770 gps gps
 
+    # libmmcamera_imglib in mm-qcamera-daemon keeps its face album at
+    # /data/fdAlbum by hardcoded path; the file lives in /data/vendor/camera.
+    mkdir /data/vendor/camera 0770 camera camera
+    symlink /data/vendor/camera/fdAlbum /data/fdAlbum
+    restorecon /data/fdAlbum
+
     # time_daemon keeps its RTC offset in /data/time.
     mkdir /data/time 0700 system system
 

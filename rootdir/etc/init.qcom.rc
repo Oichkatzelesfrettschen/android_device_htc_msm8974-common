@@ -116,6 +116,9 @@ on boot
     mkdir /dev/socket/qmux_bluetooth 0770 bluetooth bluetooth
     mkdir /dev/socket/qmux_gps 0770 gps gps
 
+    # mm-qcamera-daemon socket area
+    mkdir /dev/socket/cam 0770 camera camera
+
     # Gestures
     chown system system /sys/class/htc_sensorhub/sensor_hub/gesture_motion
     chmod 0664 /sys/class/htc_sensorhub/sensor_hub/gesture_motion
