@@ -7,3 +7,27 @@
 # attempt to use a UDP socket, we still see a selinux denial,
 # but it is safe to ignore.
 dontaudit hal_gnss_default self:udp_socket create;
+
+# The legacy GNSS HAL (loc_api in gps.msm8974) reaches the modem through
+# qmuxd and netmgrd, keeps its message queues in /data/misc/location, and
+# probes sysfs for the SoC and modem type.
+allow hal_gnss location_data_file:dir rw_dir_perms;
+allow hal_gnss location_data_file:file create_file_perms;
+allow hal_gnss location_data_file:sock_file { create unlink };
+netmgr_socket(hal_gnss)
+qmux_socket(hal_gnss)
+vndbinder_use(hal_gnss)
+allow hal_gnss self:{
+    socket
+    netlink_socket
+    netlink_generic_socket
+} create_socket_perms_no_ioctl;
+allow hal_gnss self:netlink_route_socket { create_socket_perms_no_ioctl nlmsg_read nlmsg_write };
+allow hal_gnss self:socket { rw_socket_perms create ioctl };
+allowxperm hal_gnss self:socket ioctl msm_sock_ipc_ioctls;
+allow hal_gnss sysfs:file r_file_perms;
+allow hal_gnss sysfs_data:file r_file_perms;
+allow hal_gnss sysfs:dir r_dir_perms;
+userdebug_or_eng(`
+    diag_use(hal_gnss)
+')
