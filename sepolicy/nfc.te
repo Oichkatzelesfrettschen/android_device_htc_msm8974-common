@@ -1,1 +1,5 @@
 binder_call(nfc, gpuservice)
+
+# libnfc-nxp dlopens /vendor/firmware/libpn544_fw.so to offer a firmware
+# download; the device ships no PN544 firmware and keeps the loaded one.
+dontaudit nfc firmware_file:dir search;

@@ -2,7 +2,3 @@
 # /dev/pn544 (nfc_device): read/write carry the HCI frames and the
 # PN544_SET_PWR ioctl sequences the power and download-mode GPIOs.
 allow nfc nfc_device:chr_file rw_file_perms;
-
-# libnfc-nxp dlopens /vendor/firmware/libpn544_fw.so to offer a firmware
-# download; the device ships no PN544 firmware and keeps the loaded one.
-dontaudit nfc firmware_file:dir search;
