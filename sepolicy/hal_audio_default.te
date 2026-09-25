@@ -1,2 +1,7 @@
 # The haptic generator effect loads in the audio HAL and reads its gain.
 get_prop(hal_audio_default, vendor_qti_probe_prop)
+
+# The audio HAL probes /data/misc/audio for ACDB override files, which this
+# device never writes; the platform owns audio_data_file and the neverallows
+# keep vendor domains out of it.
+dontaudit hal_audio_default audio_data_file:dir search;
