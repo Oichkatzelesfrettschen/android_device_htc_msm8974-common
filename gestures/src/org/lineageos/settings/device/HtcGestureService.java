@@ -31,6 +31,7 @@ import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraAccessException;
 import android.media.AudioManager;
 import android.os.IBinder;
+import android.os.RemoteException;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.os.SystemClock;
@@ -41,6 +42,7 @@ import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.WindowManagerGlobal;
 
 import lineageos.providers.LineageSettings;
 
@@ -60,6 +62,11 @@ public class HtcGestureService extends Service {
     private static final int ACTION_NONE = 0;
     private static final int ACTION_CAMERA = 1;
     private static final int ACTION_TORCH = 2;
+    private static final int ACTION_WAKE = 3;
+    private static final int ACTION_UNLOCK = 4;
+
+    /* Stock Motion Launch wakes the phone on a swipe up */
+    private static final int DEFAULT_SWIPE_UP_ACTION = ACTION_WAKE;
 
     private Context mContext;
     private GestureMotionSensor mGestureSensor;
@@ -193,6 +200,15 @@ public class HtcGestureService extends Service {
             case ACTION_TORCH:
                 handleFlashlightActivation();
                 break;
+            case ACTION_WAKE:
+                doHapticFeedback();
+                wakeScreen();
+                break;
+            case ACTION_UNLOCK:
+                doHapticFeedback();
+                wakeScreen();
+                dismissKeyguard();
+                break;
             case ACTION_NONE:
             default:
                 break;
@@ -219,6 +235,25 @@ public class HtcGestureService extends Service {
             mContext.startActivityAsUser(intent, null, new UserHandle(UserHandle.USER_CURRENT));
         } catch (ActivityNotFoundException e) {
             /* Ignore */
+        }
+    }
+
+    private void wakeScreen() {
+        mSensorWakeLock.acquire(SENSOR_WAKELOCK_DURATION);
+        mPowerManager.wakeUp(SystemClock.uptimeMillis(), PowerManager.WAKE_REASON_GESTURE,
+                TAG + ":swipe");
+    }
+
+    /*
+     * Returns to the last screen: an insecure keyguard goes away, a secure
+     * one shows its bouncer. The service runs as the system uid, which holds
+     * CONTROL_KEYGUARD.
+     */
+    private void dismissKeyguard() {
+        try {
+            WindowManagerGlobal.getWindowManagerService().dismissKeyguard(null, null);
+        } catch (RemoteException e) {
+            Log.e(TAG, "dismissKeyguard failed", e);
         }
     }
 
@@ -308,7 +343,7 @@ public class HtcGestureService extends Service {
     private void loadPreferences(SharedPreferences sharedPreferences) {
         try {
             mSwipeUpAction = Integer.parseInt(sharedPreferences.getString(KEY_SWIPE_UP,
-                        Integer.toString(ACTION_NONE)));
+                        Integer.toString(DEFAULT_SWIPE_UP_ACTION)));
             mSwipeDownAction = Integer.parseInt(sharedPreferences.getString(KEY_SWIPE_DOWN,
                         Integer.toString(ACTION_NONE)));
             mSwipeLeftAction = Integer.parseInt(sharedPreferences.getString(KEY_SWIPE_LEFT,
@@ -327,7 +362,7 @@ public class HtcGestureService extends Service {
             try {
                 if (KEY_SWIPE_UP.equals(key)) {
                     mSwipeUpAction = Integer.parseInt(sharedPreferences.getString(KEY_SWIPE_UP,
-                                Integer.toString(ACTION_NONE)));
+                                Integer.toString(DEFAULT_SWIPE_UP_ACTION)));
                 } else if (KEY_SWIPE_DOWN.equals(key)) {
                     mSwipeDownAction = Integer.parseInt(sharedPreferences.getString(KEY_SWIPE_DOWN,
                                 Integer.toString(ACTION_NONE)));
