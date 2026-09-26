@@ -151,10 +151,12 @@
     <!-- GnssPsdsDownloader fetches predicted orbits only from LONGTERM_PSDS_SERVER_1..3
          and injects them through IGnssXtra. The XTRA_SERVER_* keys in gps.conf feed the
          HAL's report_xtra_server_cb, which IGnssXtraCallback 1.0 does not carry.
-         xtra3grc holds GPS, GLONASS and BeiDou orbits. -->
+         The MSM8974 modem's setXtraData accepts the XTRA2 file format (xtra2.bin,
+         GPS and GLONASS orbits) and rejects the XTRA3 files with
+         eQMI_LOC_INVALID_PARAMETER_V02. -->
     <string-array name="config_gnssParameters" translatable="false">
-        <item>LONGTERM_PSDS_SERVER_1=https://xtrapath1.izatcloud.net/xtra3grc.bin</item>
-        <item>LONGTERM_PSDS_SERVER_2=https://xtrapath2.izatcloud.net/xtra3grc.bin</item>
-        <item>LONGTERM_PSDS_SERVER_3=https://xtrapath3.izatcloud.net/xtra3grc.bin</item>
+        <item>LONGTERM_PSDS_SERVER_1=https://xtrapath1.izatcloud.net/xtra2.bin</item>
+        <item>LONGTERM_PSDS_SERVER_2=https://xtrapath2.izatcloud.net/xtra2.bin</item>
+        <item>LONGTERM_PSDS_SERVER_3=https://xtrapath3.izatcloud.net/xtra2.bin</item>
     </string-array>
 </resources>
