@@ -25,6 +25,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.hardware.SensorEvent;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CameraCharacteristics;
@@ -41,6 +43,7 @@ import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.WindowManagerGlobal;
 
@@ -229,6 +232,10 @@ public class HtcGestureService extends Service {
         mSensorWakeLock.acquire(SENSOR_WAKELOCK_DURATION);
         mPowerManager.wakeUp(SystemClock.uptimeMillis());
         Intent intent = new Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA_SECURE);
+        String cameraPackage = getCameraGesturePackage();
+        if (cameraPackage != null) {
+            intent.setPackage(cameraPackage);
+        }
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
                 Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         try {
@@ -254,6 +261,32 @@ public class HtcGestureService extends Service {
             WindowManagerGlobal.getWindowManagerService().dismissKeyguard(null, null);
         } catch (RemoteException e) {
             Log.e(TAG, "dismissKeyguard failed", e);
+        }
+    }
+
+    /*
+     * The package SystemUI's own camera gesture targets
+     * (config_cameraGesturePackage, see CameraIntents.getOverrideCameraPackage),
+     * so a second secure-camera app never turns the gesture into a chooser that
+     * the keyguard dismisses. Null when the overlay names no installed package.
+     */
+    private String getCameraGesturePackage() {
+        final String systemUi = "com.android.systemui";
+        try {
+            PackageManager pm = getPackageManager();
+            Resources res = pm.getResourcesForApplication(systemUi);
+            int id = res.getIdentifier("config_cameraGesturePackage", "string", systemUi);
+            if (id == 0) {
+                return null;
+            }
+            String pkg = res.getString(id);
+            if (TextUtils.isEmpty(pkg)) {
+                return null;
+            }
+            pm.getPackageInfo(pkg, 0);
+            return pkg;
+        } catch (PackageManager.NameNotFoundException | Resources.NotFoundException e) {
+            return null;
         }
     }
 
