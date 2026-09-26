@@ -25,7 +25,7 @@
 
         <ListPreference
             android:key="swipe_up_action_key"
-            android:defaultValue="0"
+            android:defaultValue="3"
             android:title="@string/touchscreen_swipe_up_title"
             android:summary="%s"
             android:dialogTitle="@string/touchscreen_swipe_up_title"

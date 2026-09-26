@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_wake_screen">Wake the screen</string>
+    <string name="action_unlock_last_screen">Unlock to the last screen</string>
+</resources>
