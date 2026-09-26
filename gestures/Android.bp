@@ -15,6 +15,7 @@ android_app {
     privileged: true,
 
     static_libs: [
+        "LineagePreferenceLib",
         "org.lineageos.platform.internal",
         "org.lineageos.settings.resources",
     ],

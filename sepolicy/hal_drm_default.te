@@ -1,0 +1,4 @@
+# The Widevine L3 CDM in libwvdrmengine.so keeps its certificate, usage
+# table and L3 state under /data/vendor/w/IDM<uid>.
+allow hal_drm_default mediadrm_vendor_data_file:dir create_dir_perms;
+allow hal_drm_default mediadrm_vendor_data_file:file create_file_perms;

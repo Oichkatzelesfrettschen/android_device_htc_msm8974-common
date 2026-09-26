@@ -7,10 +7,25 @@
  * supply of type Unknown, which discovery skips. The paths are set here
  * instead. batt_current_now reports discharge as positive; IHealth defines
  * positive current as flowing into the battery, so the value is negated.
+ *
+ * The charge counter is the remaining charge: the bms full charge capacity
+ * (charge_full, uAh) scaled by the bms state of charge (bms/capacity), in
+ * steps of 1% of FCC. The bms state of charge, not battery/capacity, sets it,
+ * because htc_battery holds its reported level at 100 after end of charge
+ * while the bms value already falls. bms/charge_counter is the PM8941
+ * coulomb counter since its last OCV reset, a delta that turns negative while
+ * charging, and the power_supply class reports a negative value as ENODATA;
+ * batterystats needs a remaining charge that falls as the battery discharges.
  */
 
+#include <cstdint>
 #include <memory>
+#include <string>
 #include <string_view>
+
+#include <android-base/file.h>
+#include <android-base/parseint.h>
+#include <android-base/strings.h>
 
 #include <health/utils.h>
 #include <health2impl/Health.h>
@@ -29,9 +44,34 @@ namespace {
 constexpr char kBattery[] = "/sys/class/power_supply/battery/";
 constexpr char kBms[] = "/sys/class/power_supply/bms/";
 
+bool ReadInt(const std::string& path, int64_t* value) {
+    std::string text;
+    return android::base::ReadFileToString(path, &text) &&
+           android::base::ParseInt(android::base::Trim(text), value);
+}
+
+int32_t ChargeCounterUah(int64_t capacity_percent, int64_t full_charge_uah) {
+    if (capacity_percent < 0 || capacity_percent > 100 || full_charge_uah <= 0) {
+        return 0;
+    }
+    return static_cast<int32_t>(full_charge_uah * capacity_percent / 100);
+}
+
 class HtcHealth : public Health {
   public:
     using Health::Health;
+
+    Return<void> getChargeCounter(getChargeCounter_cb _hidl_cb) override {
+        int64_t capacity = 0;
+        int64_t full_charge = 0;
+        if (!ReadInt(std::string(kBms) + "capacity", &capacity) ||
+            !ReadInt(std::string(kBms) + "charge_full", &full_charge)) {
+            _hidl_cb(Result::NOT_SUPPORTED, 0);
+            return Void();
+        }
+        _hidl_cb(Result::SUCCESS, ChargeCounterUah(capacity, full_charge));
+        return Void();
+    }
 
     Return<void> getCurrentNow(getCurrentNow_cb _hidl_cb) override {
         return Health::getCurrentNow(
@@ -40,7 +80,13 @@ class HtcHealth : public Health {
 
   protected:
     void UpdateHealthInfo(HealthInfo* health_info) override {
-        health_info->legacy.legacy.batteryCurrent = -health_info->legacy.legacy.batteryCurrent;
+        auto& legacy = health_info->legacy.legacy;
+        legacy.batteryCurrent = -legacy.batteryCurrent;
+        int64_t soc = 0;
+        legacy.batteryChargeCounter =
+                ReadInt(std::string(kBms) + "capacity", &soc)
+                        ? ChargeCounterUah(soc, legacy.batteryFullCharge)
+                        : 0;
     }
 };
 

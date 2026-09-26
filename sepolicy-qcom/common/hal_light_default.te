@@ -26,3 +26,12 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 allow hal_light_default sysfs_graphics:file rw_file_perms;
+
+# The amber and green notification/battery LEDs sit under
+# /sys/devices/leds-qpnp-*/leds, labeled sysfs_leds (file_contexts), not
+# sysfs_graphics: only the backlight node is sysfs_graphics. Without this
+# rule, Light::setSpeakerLightLocked()'s writes to
+# amber|green/brightness and amber|green/blink are denied, and every
+# light stays off regardless of the RGB color the framework requests.
+r_dir_file(hal_light_default, sysfs_leds)
+allow hal_light_default sysfs_leds:file w_file_perms;

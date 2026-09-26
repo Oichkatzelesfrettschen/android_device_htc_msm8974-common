@@ -70,6 +70,16 @@ on property:sys.usb.config=ptp,adb
     write /sys/devices/platform/android_usb/usb_function_switch 262146
     setprop sys.usb.state ${sys.usb.config}
 
+# MIDI (htc_attr.c USB_FUNCTION_MIDI, bit 19)
+on property:sys.usb.config=midi
+    write /sys/devices/platform/android_usb/usb_function_switch 524288
+    setprop sys.usb.state ${sys.usb.config}
+
+on property:sys.usb.config=midi,adb
+    start adbd
+    write /sys/devices/platform/android_usb/usb_function_switch 524290
+    setprop sys.usb.state ${sys.usb.config}
+
 # USB accessory
 on property:sys.usb.config=accessory
     write /sys/devices/platform/android_usb/usb_function_switch 8192

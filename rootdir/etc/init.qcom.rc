@@ -75,6 +75,9 @@ on post-fs-data
 
     mkdir /data/vendor/sensors 0770 system system
 
+    # Widevine L3 CDM storage; libwvdrmengine.so names /data/vendor/w/IDM<uid>
+    mkdir /data/vendor/w 0770 media mediadrm
+
     setprop vold.post_fs_data_done 1
 
 on early-boot
@@ -263,3 +266,7 @@ on boot
 on property:init.svc.vendor.radio-1-4-legacy=restarting
     stop vendor.ril-daemon
     start vendor.ril-daemon
+
+on property:sys.boot_completed=1
+    # 512 MiB zram swap (fstab.qcom), compressed with lz4 (on init)
+    swapon_all /vendor/etc/fstab.qcom

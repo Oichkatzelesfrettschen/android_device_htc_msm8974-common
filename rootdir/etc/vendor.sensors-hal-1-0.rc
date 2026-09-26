@@ -1,0 +1,16 @@
+# The HTC sensors HAL (sensors.msm8974.so) finds the CwMcuSensor hub by
+# opening each /dev/input/event* node, which ueventd creates root:input 0660,
+# so its service needs the input group beside the AOSP groups. init parses
+# /vendor/etc/init in name order, and this file sorts after
+# android.hardware.sensors@1.0-service.rc, whose definition it overrides.
+# override precedes interface: ServiceParser::ParseInterface rejects an
+# interface another service declares unless this service is already marked
+# override when the line is parsed.
+service vendor.sensors-hal-1-0 /vendor/bin/hw/android.hardware.sensors@1.0-service
+    override
+    interface android.hardware.sensors@1.0::ISensors default
+    class hal
+    user system
+    group system wakelock uhid context_hub input
+    capabilities BLOCK_SUSPEND
+    rlimit rtprio 10 10

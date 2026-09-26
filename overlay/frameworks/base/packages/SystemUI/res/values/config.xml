@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The secure camera the lock screen affordance, the power-key double
+         press and GestureHandler's camera gesture open; with a second app
+         that handles STILL_IMAGE_CAMERA_SECURE installed, an unset value
+         resolves to a chooser the keyguard dismisses. -->
+    <string name="config_cameraGesturePackage" translatable="false">org.lineageos.aperture</string>
+</resources>
