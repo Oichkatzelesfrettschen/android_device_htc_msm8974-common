@@ -9,6 +9,7 @@
 # Data files
 /dev/socket/cam(/.*)?                                                                 u:object_r:camera_socket:s0
 /data/vendor/mediadrm(/.*)?                                                         u:object_r:mediadrm_vendor_data_file:s0
+/data/vendor/w(/.*)?                                                                u:object_r:mediadrm_vendor_data_file:s0
 
 # Sensors HAL calibration, reached through links at its hardcoded /data/misc paths
 /data/misc/(cw_calibrator_mag\.ini|AccOffset\.txt)                                   u:object_r:sensors_data_file:s0

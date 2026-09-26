@@ -75,6 +75,9 @@ on post-fs-data
 
     mkdir /data/vendor/sensors 0770 system system
 
+    # Widevine L3 CDM storage; libwvdrmengine.so names /data/vendor/w/IDM<uid>
+    mkdir /data/vendor/w 0770 media mediadrm
+
     setprop vold.post_fs_data_done 1
 
 on early-boot
