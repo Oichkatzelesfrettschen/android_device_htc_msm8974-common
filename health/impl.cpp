@@ -9,11 +9,13 @@
  * positive current as flowing into the battery, so the value is negated.
  *
  * The charge counter is the remaining charge: the bms full charge capacity
- * (charge_full, uAh) scaled by the battery capacity percentage, in steps of
- * 1% of FCC. bms/charge_counter is the PM8941 coulomb counter since its last
- * OCV reset, a delta that turns negative while charging, and the power_supply
- * class reports a negative value as ENODATA; batterystats needs a remaining
- * charge that falls as the battery discharges.
+ * (charge_full, uAh) scaled by the bms state of charge (bms/capacity), in
+ * steps of 1% of FCC. The bms state of charge, not battery/capacity, sets it,
+ * because htc_battery holds its reported level at 100 after end of charge
+ * while the bms value already falls. bms/charge_counter is the PM8941
+ * coulomb counter since its last OCV reset, a delta that turns negative while
+ * charging, and the power_supply class reports a negative value as ENODATA;
+ * batterystats needs a remaining charge that falls as the battery discharges.
  */
 
 #include <cstdint>
@@ -62,7 +64,7 @@ class HtcHealth : public Health {
     Return<void> getChargeCounter(getChargeCounter_cb _hidl_cb) override {
         int64_t capacity = 0;
         int64_t full_charge = 0;
-        if (!ReadInt(std::string(kBattery) + "capacity", &capacity) ||
+        if (!ReadInt(std::string(kBms) + "capacity", &capacity) ||
             !ReadInt(std::string(kBms) + "charge_full", &full_charge)) {
             _hidl_cb(Result::NOT_SUPPORTED, 0);
             return Void();
@@ -80,8 +82,11 @@ class HtcHealth : public Health {
     void UpdateHealthInfo(HealthInfo* health_info) override {
         auto& legacy = health_info->legacy.legacy;
         legacy.batteryCurrent = -legacy.batteryCurrent;
+        int64_t soc = 0;
         legacy.batteryChargeCounter =
-                ChargeCounterUah(legacy.batteryLevel, legacy.batteryFullCharge);
+                ReadInt(std::string(kBms) + "capacity", &soc)
+                        ? ChargeCounterUah(soc, legacy.batteryFullCharge)
+                        : 0;
     }
 };
 
