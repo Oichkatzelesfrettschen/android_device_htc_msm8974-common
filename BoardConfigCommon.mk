@@ -51,6 +51,9 @@ TARGET_CPU_VARIANT_RUNTIME := krait
 # Kernel
 BOARD_DTBTOOL_ARGS := --dt-tag "htc,project-id = <"
 BOARD_KERNEL_CMDLINE := console=none androidboot.hardware=qcom user_debug=31 ehci-hcd.park=3 zcache
+# The 3.4 loop driver scans partitions only when max_part is set; 7 gives
+# each loop device 8 minors, enough for vold's two-partition private disk.
+BOARD_KERNEL_CMDLINE += loop.max_part=7
 BOARD_KERNEL_BASE := 0x00000000
 BOARD_KERNEL_IMAGE_NAME := zImage
 BOARD_KERNEL_PAGESIZE := 2048
