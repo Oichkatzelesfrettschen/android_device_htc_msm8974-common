@@ -266,3 +266,7 @@ on boot
 on property:init.svc.vendor.radio-1-4-legacy=restarting
     stop vendor.ril-daemon
     start vendor.ril-daemon
+
+on property:sys.boot_completed=1
+    # 512 MiB zram swap (fstab.qcom), compressed with lz4 (on init)
+    swapon_all /vendor/etc/fstab.qcom
