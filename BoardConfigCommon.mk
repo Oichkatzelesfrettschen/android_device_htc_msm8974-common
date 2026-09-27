@@ -114,6 +114,17 @@ TARGET_FS_CONFIG_GEN := $(PLATFORM_PATH)/config.fs
 BOARD_HAVE_QCOM_FM := true
 TARGET_QCOM_NO_FM_FIRMWARE := true
 
+# hardware/qcom-caf/msm8974/media reads this flag in venc, vdec and
+# libstagefrighthw only (Android.mk in each). Unset, venc packs
+# kMetadataBufferTypeCameraSource while CameraSource itself (frameworks/av)
+# packs kMetadataBufferTypeNativeHandleSource -- the metadata type-tag
+# mismatch that starves every recording within its first ~3 s
+# (notes/CAMERA_RECORDING_FLUSH_RCA.md). Set, venc gains
+# USE_NATIVE_HANDLE_SOURCE (the tag CameraSource actually sends) and vdec
+# gains ALLOCATE_OUTPUT_NATIVEHANDLE, its matching output-side allocation
+# mode.
+TARGET_USES_MEDIA_EXTENSIONS := true
+
 # Graphics
 TARGET_USES_ION := true
 USE_OPENGL_RENDERER := true
