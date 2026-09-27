@@ -117,6 +117,21 @@ Only the three quirks included above are recognized at this point:
     </Settings>
     <Encoders>
         <!-- Audio Hardware  -->
+        <MediaCodec name="OMX.qcom.audio.encoder.aac" type="audio/mp4a-latm" >
+            <Limit name="channel-count" max="2" />
+            <Limit name="sample-rate" ranges="8000,11025,12000,16000,22050,24000,32000,44100,48000" />
+            <Limit name="bitrate" range="8000-320000" />
+        </MediaCodec>
+        <MediaCodec name="OMX.qcom.audio.encoder.evrc" type="audio/evrc" >
+            <Limit name="channel-count" max="1" />
+            <Limit name="sample-rate" ranges="8000" />
+            <Limit name="bitrate" range="1000-9600" />
+        </MediaCodec>
+        <MediaCodec name="OMX.qcom.audio.encoder.qcelp13" type="audio/qcelp" >
+            <Limit name="channel-count" max="1" />
+            <Limit name="sample-rate" ranges="8000" />
+            <Limit name="bitrate" range="1000-14400" />
+        </MediaCodec>
         <!-- Audio Software  -->
         <!-- Video Hardware  -->
         <MediaCodec name="OMX.qcom.video.encoder.avc" type="video/avc" >
@@ -290,6 +305,15 @@ Only the three quirks included above are recognized at this point:
             <Limit name="concurrent-instances" max="13" />
         </MediaCodec>
         <MediaCodec name="OMX.google.opus.decoder" type="audio/opus" update="true" rank="100"/>
+        <!-- Audio Hardware  -->
+        <MediaCodec name="OMX.qcom.audio.decoder.evrc" type="audio/evrc" >
+            <Limit name="channel-count" max="1" />
+            <Limit name="sample-rate" ranges="8000" />
+        </MediaCodec>
+        <MediaCodec name="OMX.qcom.audio.decoder.Qcelp13" type="audio/qcelp" >
+            <Limit name="channel-count" max="1" />
+            <Limit name="sample-rate" ranges="8000" />
+        </MediaCodec>
     </Decoders>
     <Include href="media_codecs_google_video.xml" />
     <!--Include href="media_codecs_ffmpeg.xml" /-->
