@@ -274,6 +274,12 @@
         <ctl name="SLIMBUS_0_RX Audio Mixer MultiMedia4" value="1" />
     </path>
 
+    <!-- compress-offload-playback2 is PCM device 17 (PLAYBACK_OFFLOAD_DEVICE2),
+         the "MSM8974 Compr2" link whose frontend is MultiMedia6. -->
+    <path name="compress-offload-playback2">
+        <ctl name="SLIMBUS_0_RX Audio Mixer MultiMedia6" value="1" />
+    </path>
+
     <path name="compress-offload-playback hdmi">
         <ctl name="HDMI Mixer MultiMedia4" value="1" />
     </path>
