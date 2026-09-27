@@ -1,0 +1,6 @@
+# crash_dump symbolizes a backtrace by reading the .so files mapped into
+# the crashing process, including vendor shims labeled vendor_shim_target_file
+# (file_contexts: camera.vendor.msm8974.so, libril*-qc-qmi-1.so). Without
+# read access the symbolizer misses those frames; audit(0.0:27-31) recorded
+# the denial reading camera.vendor.msm8974.so while dumping cameraserver.
+allow crash_dump vendor_shim_target_file:file r_file_perms;
