@@ -118,39 +118,30 @@ Only the three quirks included above are recognized at this point:
     <Encoders>
         <!-- Audio Hardware  -->
         <!--
-             libOmxAacEnc.so crashes android.hardware.media.omx@1.0-service
-             on the OMX.google.android.index.storeMetaDataInBuffers query
-             MediaRecorder issues before real use, taking down every other
-             codec instance sharing that process with it. A high rank keeps
-             the component enumerable without MediaRecorder or MediaCodec's
-             default selection ever choosing it over the software encoder.
+             libOmxAacEnc.so, libOmxEvrcEnc.so and libOmxQcelp13Enc.so all
+             abort with the identical bionic FORTIFY catch
+             ("pthread_mutex_destroy called on a destroyed mutex") in their
+             own destructor (omx_aac_aenc::~omx_aac_aenc(),
+             omx_evrc_aenc::~omx_evrc_aenc(), and the qcelp13 equivalent),
+             reached through qc_omx_component_deinit() -> OMX_FreeHandle().
+             This fires during media.codec's own boot-time component
+             enumeration (OMXStore::destroyComponentInstance() after a
+             probe instantiation), independent of rank and independent of
+             any real encode ever being requested. evidence/
+             m8-tombstones-20260927/ holds ten crash captures, one per boot,
+             alternating between the aac and evrc destructors. A rank
+             changes runtime selection preference among several candidates;
+             it does not stop the framework's boot-time probe from
+             instantiating and destroying every declared component once.
+             Removing the declaration is the only correct fix, not a rank.
+             AAC keeps full capability through AOSP's own software encoder
+             (media_codecs_google_c2_audio.xml); evrc and qcelp13 have no
+             software equivalent in this tree, so this device loses EVRC/
+             QCELP hardware encode. Both formats serve CDMA voice-call
+             audio, which this device's carrier network (Sprint) shut down
+             in 2022 (notes/DEVICE_STATE.md), so the capability has no
+             reachable network to serve regardless.
         -->
-        <MediaCodec name="OMX.qcom.audio.encoder.aac" type="audio/mp4a-latm" rank="2000" >
-            <Limit name="channel-count" max="2" />
-            <Limit name="sample-rate" ranges="8000,11025,12000,16000,22050,24000,32000,44100,48000" />
-            <Limit name="bitrate" range="8000-320000" />
-        </MediaCodec>
-        <!--
-             libOmxEvrcEnc.so has a use-after-destroy mutex bug (bionic's
-             fortify check catches it). AOSP's own software audio codec
-             lists (media_codecs_google_audio.xml,
-             media_codecs_google_c2_audio.xml) declare no evrc or qcelp
-             encoder at all, so this rank cannot hand selection to a
-             software fallback the way the AAC rank above does -- it is the
-             only encoder for this MIME type either way. It is set to match
-             AAC's rank regardless, so a future software or Codec2 entry for
-             either format inherits the demotion without a second edit.
-        -->
-        <MediaCodec name="OMX.qcom.audio.encoder.evrc" type="audio/evrc" rank="2000" >
-            <Limit name="channel-count" max="1" />
-            <Limit name="sample-rate" ranges="8000" />
-            <Limit name="bitrate" range="1000-9600" />
-        </MediaCodec>
-        <MediaCodec name="OMX.qcom.audio.encoder.qcelp13" type="audio/qcelp" rank="2000" >
-            <Limit name="channel-count" max="1" />
-            <Limit name="sample-rate" ranges="8000" />
-            <Limit name="bitrate" range="1000-14400" />
-        </MediaCodec>
         <!-- Audio Software  -->
         <!-- Video Hardware  -->
         <MediaCodec name="OMX.qcom.video.encoder.avc" type="video/avc" >
