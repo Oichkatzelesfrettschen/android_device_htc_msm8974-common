@@ -44,4 +44,6 @@ typedef struct
    int                            xtra_data_len;
 } loc_eng_xtra_data_s_type;
 
+void loc_eng_xtra_cleanup();
+
 #endif // LOC_ENG_XTRA_H

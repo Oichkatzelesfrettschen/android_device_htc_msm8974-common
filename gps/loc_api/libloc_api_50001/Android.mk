@@ -20,6 +20,7 @@ LOCAL_SRC_FILES += \
     loc_eng.cpp \
     loc_eng_agps.cpp \
     loc_eng_xtra.cpp \
+    XtraQmiInjector.cpp \
     loc_eng_ni.cpp \
     loc_eng_log.cpp \
     loc_eng_nmea.cpp \
@@ -41,6 +42,7 @@ LOCAL_C_INCLUDES:= \
     $(TARGET_OUT_HEADERS)/gps.utils \
     $(TARGET_OUT_HEADERS)/libloc_core \
     $(LOCAL_PATH) \
+    $(LOCAL_PATH)/../loc_api_v02 \
     $(TARGET_OUT_HEADERS)/libflp \
     hardware/libhardware/include
 

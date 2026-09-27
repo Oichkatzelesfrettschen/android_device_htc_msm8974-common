@@ -31,12 +31,157 @@
 #define LOG_TAG "LocSvc_eng"
 
 #include <stdint.h>
+#include <pthread.h>
+#include <time.h>
 #include <loc_eng.h>
 #include <MsgTask.h>
+#include <LocTimer.h>
 #include "log_util.h"
 #include "platform_lib_includes.h"
+#include "XtraFormatGuard.h"
+#include "XtraQmiInjector.h"
 
 using namespace loc_core;
+
+static time_t xtraRetryClockSeconds()
+{
+    struct timespec now;
+    clock_gettime(CLOCK_BOOTTIME, &now);
+    return now.tv_sec;
+}
+
+class XtraRetryTimer : public LocTimer {
+    pthread_mutex_t mMutex;
+    pthread_cond_t mCallbackDone;
+    gps_xtra_download_request mCallback;
+    unsigned int mRetriesRequested;
+    bool mScheduled;
+    bool mActive;
+    time_t mLastRetry;
+    bool mCallbackRunning;
+    bool mInjectionRunning;
+    unsigned int mEpoch;
+
+public:
+    XtraRetryTimer() : mCallback(NULL), mRetriesRequested(0),
+                       mScheduled(false), mActive(false), mLastRetry(0),
+                       mCallbackRunning(false), mInjectionRunning(false),
+                       mEpoch(0) {
+        pthread_mutex_init(&mMutex, NULL);
+        pthread_cond_init(&mCallbackDone, NULL);
+    }
+
+    ~XtraRetryTimer() {
+        stop();
+        pthread_cond_destroy(&mCallbackDone);
+        pthread_mutex_destroy(&mMutex);
+    }
+
+    void initialize(gps_xtra_download_request callback) {
+        pthread_mutex_lock(&mMutex);
+        mActive = false;
+        ++mEpoch;
+        mCallback = NULL;
+        mRetriesRequested = 0;
+        mScheduled = false;
+        stop();
+        while (mCallbackRunning || mInjectionRunning)
+            pthread_cond_wait(&mCallbackDone, &mMutex);
+        mActive = true;
+        mCallback = callback;
+        pthread_mutex_unlock(&mMutex);
+    }
+
+    void cleanup() {
+        pthread_mutex_lock(&mMutex);
+        mActive = false;
+        ++mEpoch;
+        mCallback = NULL;
+        mRetriesRequested = 0;
+        mScheduled = false;
+        stop();
+        while (mCallbackRunning || mInjectionRunning)
+            pthread_cond_wait(&mCallbackDone, &mMutex);
+        pthread_mutex_unlock(&mMutex);
+    }
+
+    void recordResult(bool accepted) {
+        static const uint32_t delaysMs[] = {30000, 120000, 600000};
+        pthread_mutex_lock(&mMutex);
+        if (mActive) {
+            if (accepted) {
+                stop();
+                mScheduled = false;
+                mRetriesRequested = 0;
+            } else if (!mScheduled && mCallback != NULL) {
+                const time_t now = xtraRetryClockSeconds();
+                if (mRetriesRequested == 3 && now - mLastRetry >= 3600)
+                    mRetriesRequested = 0;
+                if (mRetriesRequested < 3) {
+                    mScheduled = start(delaysMs[mRetriesRequested], false);
+                    if (mScheduled) {
+                        LOC_LOGI("XTRA retry scheduled: delay_ms=%u retry=%u/3",
+                                 delaysMs[mRetriesRequested], mRetriesRequested + 1);
+                    } else {
+                        LOC_LOGE("XTRA retry timer failed to start");
+                    }
+                }
+            }
+        }
+        pthread_mutex_unlock(&mMutex);
+    }
+
+    unsigned int currentEpoch() {
+        pthread_mutex_lock(&mMutex);
+        const unsigned int epoch = mEpoch;
+        pthread_mutex_unlock(&mMutex);
+        return epoch;
+    }
+
+    bool beginInjection(unsigned int epoch) {
+        pthread_mutex_lock(&mMutex);
+        const bool current = mActive && mEpoch == epoch;
+        if (current)
+            mInjectionRunning = true;
+        pthread_mutex_unlock(&mMutex);
+        return current;
+    }
+
+    void endInjection() {
+        pthread_mutex_lock(&mMutex);
+        mInjectionRunning = false;
+        pthread_cond_broadcast(&mCallbackDone);
+        pthread_mutex_unlock(&mMutex);
+    }
+
+    virtual void timeOutCallback() {
+        pthread_mutex_lock(&mMutex);
+        mScheduled = false;
+        if (mActive && mCallback != NULL && mRetriesRequested < 3) {
+            ++mRetriesRequested;
+            mLastRetry = xtraRetryClockSeconds();
+            mCallbackRunning = true;
+            gps_xtra_download_request callback = mCallback;
+            LOC_LOGI("XTRA retry requesting download: retry=%u/3",
+                     mRetriesRequested);
+            pthread_mutex_unlock(&mMutex);
+            callback();
+            pthread_mutex_lock(&mMutex);
+            mCallbackRunning = false;
+            pthread_cond_broadcast(&mCallbackDone);
+            pthread_mutex_unlock(&mMutex);
+            return;
+        }
+        pthread_mutex_unlock(&mMutex);
+    }
+};
+
+static XtraRetryTimer xtraRetryTimer;
+
+void loc_eng_xtra_cleanup()
+{
+    xtraRetryTimer.cleanup();
+}
 
 struct LocEngRequestXtraServer : public LocMsg {
     LocEngAdapter* mAdapter;
@@ -56,15 +201,8 @@ struct LocEngRequestXtraServer : public LocMsg {
     }
 };
 
-/* FNV-1a over the injected buffer. Pins which file actually reached
-   setXtraData(): GnssPsdsDownloader (frameworks/base) load-balances across
-   LONGTERM_PSDS_SERVER_1..3 with a randomized start index and rotates on
-   every download, so two force_psds_injection calls can carry different
-   bytes even though gps.conf's XTRA_SERVER_n (which loc_xtra_init never
-   wires to a callback) stayed fixed. Without a content fingerprint here,
-   a QMI part-count log at the adapter has no way to tell a genuine
-   modem-side rejection from a size difference introduced by server
-   rotation. */
+/* GnssPsdsDownloader rotates mirrors. The fingerprint identifies the exact
+   downloaded payload associated with each QMI injection result. */
 static uint32_t xtra_fnv1a(const char* data, int len)
 {
     uint32_t hash = 0x811c9dc5u;
@@ -76,13 +214,12 @@ static uint32_t xtra_fnv1a(const char* data, int len)
 }
 
 struct LocEngInjectXtraData : public LocMsg {
-    LocEngAdapter* mAdapter;
     char* mData;
     const int mLen;
-    inline LocEngInjectXtraData(LocEngAdapter* adapter,
-                                char* data, int len):
-        LocMsg(), mAdapter(adapter),
-        mData(new char[len]), mLen(len)
+    const unsigned int mEpoch;
+    inline LocEngInjectXtraData(char* data, int len):
+        LocMsg(),
+        mData(new char[len]), mLen(len), mEpoch(xtraRetryTimer.currentEpoch())
     {
         memcpy((void*)mData, (void*)data, len);
         locallog();
@@ -92,23 +229,28 @@ struct LocEngInjectXtraData : public LocMsg {
         delete[] mData;
     }
     inline virtual void proc() const {
-        /* expected_parts mirrors LocApiV02::setXtraData's own
-           ((length - 1) / QMI_LOC_MAX_PREDICTED_ORBITS_PART_LEN_V02) + 1
-           (location_service_v02.h; the part length ceiling is 1024 bytes)
-           so a part-count mismatch between this log and the adapter's own
-           QMI_LOC_INJECT_PREDICTED_ORBITS_DATA_REQ log names a length
-           change between dispatch and the adapter call, not a modem
-           artifact. */
-        LOC_LOGI("setXtraData dispatch: length=%d fnv1a=0x%08x "
+        if (!xtraRetryTimer.beginInjection(mEpoch)) {
+            LOC_LOGI("XTRA injection skipped after HAL cleanup");
+            return;
+        }
+        /* Each part is limited to 1024 bytes by location_service_v02.h. */
+        LOC_LOGI("XTRA QMI dispatch: length=%d fnv1a=0x%08x "
                  "magic=%02x%02x expected_parts=%d",
                  mLen, xtra_fnv1a(mData, mLen),
                  mLen > 0 ? (uint8_t)mData[0] : 0,
                  mLen > 1 ? (uint8_t)mData[1] : 0,
                  mLen > 0 ? ((mLen - 1) / 1024) + 1 : 0);
-        mAdapter->setXtraData(mData, mLen);
+        /* The prebuilt adapter reports QMI transport success even when the
+           modem rejects the assembled file. Read each modem indication. */
+        const XtraInjectionResult result = injectXtraWithModemStatus(mData, mLen);
+        LOC_LOGI("XTRA QMI result: accepted=%d client=%d modem=%d part=%u",
+                 result.accepted, result.clientStatus, result.modemStatus,
+                 result.partNumber);
+        xtraRetryTimer.recordResult(result.accepted);
+        xtraRetryTimer.endInjection();
     }
     inline  void locallog() const {
-        LOC_LOGI("setXtraData queued: length=%d fnv1a=0x%08x data=%p",
+        LOC_LOGI("XTRA injection queued: length=%d fnv1a=0x%08x data=%p",
                  mLen, xtra_fnv1a(mData, mLen), mData);
     }
     inline virtual void log() const {
@@ -164,6 +306,7 @@ int loc_eng_xtra_init (loc_eng_data_s_type &loc_eng_data,
         xtra_module_data_ptr = &loc_eng_data.xtra_module_data;
         xtra_module_data_ptr->download_request_cb = callbacks->download_request_cb;
         xtra_module_data_ptr->report_xtra_server_cb = callbacks->report_xtra_server_cb;
+        xtraRetryTimer.initialize(callbacks->download_request_cb);
 
         ret_val = 0;
     }
@@ -191,8 +334,16 @@ int loc_eng_xtra_inject_data(loc_eng_data_s_type &loc_eng_data,
                              char* data, int length)
 {
     ENTRY_LOG();
+    const XtraFormatStatus format =
+            classifyXtraFormat(data, length > 0 ? length : 0);
+    if (format != XTRA_FORMAT_SUPPORTED) {
+        LOC_LOGE("XTRA injection refused: format=%d length=%d", format, length);
+        xtraRetryTimer.recordResult(false);
+        EXIT_LOG(%d, -1);
+        return -1;
+    }
     LocEngAdapter* adapter = loc_eng_data.adapter;
-    adapter->sendMsg(new LocEngInjectXtraData(adapter, data, length));
+    adapter->sendMsg(new LocEngInjectXtraData(data, length));
     EXIT_LOG(%d, 0);
     return 0;
 }
