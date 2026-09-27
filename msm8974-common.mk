@@ -51,8 +51,7 @@ PRODUCT_PACKAGES += \
     init.qcom.rc \
     init.qcom.power.rc \
     init.qcom.usb.rc \
-    ueventd.qcom.rc \
-    vendor.sensors-hal-1-0.rc
+    ueventd.qcom.rc
 
 # QCOM init scripts
 PRODUCT_PACKAGES += \
@@ -295,8 +294,11 @@ PRODUCT_COPY_FILES += \
 
 # Sensors
 PRODUCT_PACKAGES += \
-    android.hardware.sensors@1.0-impl \
-    android.hardware.sensors@1.0-service
+    android.hardware.sensors-service.multihal \
+    android.hardware.sensors@2.0-subhal-impl-1.0
+
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/configs/sensors/hals.conf:$(TARGET_COPY_OUT_VENDOR)/etc/sensors/hals.conf
 
 # Touch HAL
 PRODUCT_PACKAGES += \
