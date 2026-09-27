@@ -46,3 +46,10 @@ on post-fs-data
 # copy replaces it once apexd has activated the APEX.
 on property:apexd.status=ready
     mount none /system/etc/swcodec/ld.config.txt /apex/com.android.media.swcodec/etc/ld.config.txt bind
+
+# android.hardware.thermal-service.pixel.rc gates vendor.thermal-hal on
+# vendor.thermal.link_ready=1, a Pixel thermal-driver-linking property this
+# tsens-based board never sets; tsens is available as soon as the vendor
+# partition mounts, so it is unconditionally ready.
+on boot
+    setprop vendor.thermal.link_ready 1
