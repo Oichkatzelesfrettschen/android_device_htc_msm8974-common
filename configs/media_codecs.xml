@@ -130,12 +130,23 @@ Only the three quirks included above are recognized at this point:
             <Limit name="sample-rate" ranges="8000,11025,12000,16000,22050,24000,32000,44100,48000" />
             <Limit name="bitrate" range="8000-320000" />
         </MediaCodec>
-        <MediaCodec name="OMX.qcom.audio.encoder.evrc" type="audio/evrc" >
+        <!--
+             libOmxEvrcEnc.so has a use-after-destroy mutex bug (bionic's
+             fortify check catches it). AOSP's own software audio codec
+             lists (media_codecs_google_audio.xml,
+             media_codecs_google_c2_audio.xml) declare no evrc or qcelp
+             encoder at all, so this rank cannot hand selection to a
+             software fallback the way the AAC rank above does -- it is the
+             only encoder for this MIME type either way. It is set to match
+             AAC's rank regardless, so a future software or Codec2 entry for
+             either format inherits the demotion without a second edit.
+        -->
+        <MediaCodec name="OMX.qcom.audio.encoder.evrc" type="audio/evrc" rank="2000" >
             <Limit name="channel-count" max="1" />
             <Limit name="sample-rate" ranges="8000" />
             <Limit name="bitrate" range="1000-9600" />
         </MediaCodec>
-        <MediaCodec name="OMX.qcom.audio.encoder.qcelp13" type="audio/qcelp" >
+        <MediaCodec name="OMX.qcom.audio.encoder.qcelp13" type="audio/qcelp" rank="2000" >
             <Limit name="channel-count" max="1" />
             <Limit name="sample-rate" ranges="8000" />
             <Limit name="bitrate" range="1000-14400" />
