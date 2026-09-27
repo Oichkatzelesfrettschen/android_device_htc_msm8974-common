@@ -3,7 +3,7 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE := gnss_xtra_probe
-LOCAL_MODULE_TAGS := optional debug
+LOCAL_MODULE_TAGS := optional
 LOCAL_PROPRIETARY_MODULE := true
 
 # QMI_LOC_GET_PREDICTED_ORBITS_DATA_SOURCE_REQ_V02 and
