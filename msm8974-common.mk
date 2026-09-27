@@ -135,7 +135,9 @@ PRODUCT_PACKAGES += \
     libbt-vendor
 
 PRODUCT_SOONG_NAMESPACES += \
-    hardware/qcom-caf/bt/libbt-vendor
+    hardware/qcom-caf/bt/libbt-vendor \
+    hardware/google/pixel \
+    hardware/google/interfaces
 
 # Camera
 PRODUCT_PACKAGES += \
