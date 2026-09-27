@@ -117,7 +117,15 @@ Only the three quirks included above are recognized at this point:
     </Settings>
     <Encoders>
         <!-- Audio Hardware  -->
-        <MediaCodec name="OMX.qcom.audio.encoder.aac" type="audio/mp4a-latm" >
+        <!--
+             libOmxAacEnc.so crashes android.hardware.media.omx@1.0-service
+             on the OMX.google.android.index.storeMetaDataInBuffers query
+             MediaRecorder issues before real use, taking down every other
+             codec instance sharing that process with it. A high rank keeps
+             the component enumerable without MediaRecorder or MediaCodec's
+             default selection ever choosing it over the software encoder.
+        -->
+        <MediaCodec name="OMX.qcom.audio.encoder.aac" type="audio/mp4a-latm" rank="2000" >
             <Limit name="channel-count" max="2" />
             <Limit name="sample-rate" ranges="8000,11025,12000,16000,22050,24000,32000,44100,48000" />
             <Limit name="bitrate" range="8000-320000" />
