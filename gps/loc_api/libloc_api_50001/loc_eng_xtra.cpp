@@ -30,6 +30,7 @@
 #define LOG_NDDEBUG 0
 #define LOG_TAG "LocSvc_eng"
 
+#include <stdint.h>
 #include <loc_eng.h>
 #include <MsgTask.h>
 #include "log_util.h"
@@ -55,6 +56,25 @@ struct LocEngRequestXtraServer : public LocMsg {
     }
 };
 
+/* FNV-1a over the injected buffer. Pins which file actually reached
+   setXtraData(): GnssPsdsDownloader (frameworks/base) load-balances across
+   LONGTERM_PSDS_SERVER_1..3 with a randomized start index and rotates on
+   every download, so two force_psds_injection calls can carry different
+   bytes even though gps.conf's XTRA_SERVER_n (which loc_xtra_init never
+   wires to a callback) stayed fixed. Without a content fingerprint here,
+   a QMI part-count log at the adapter has no way to tell a genuine
+   modem-side rejection from a size difference introduced by server
+   rotation. */
+static uint32_t xtra_fnv1a(const char* data, int len)
+{
+    uint32_t hash = 0x811c9dc5u;
+    for (int i = 0; i < len; i++) {
+        hash ^= (uint8_t)data[i];
+        hash *= 0x01000193u;
+    }
+    return hash;
+}
+
 struct LocEngInjectXtraData : public LocMsg {
     LocEngAdapter* mAdapter;
     char* mData;
@@ -72,10 +92,24 @@ struct LocEngInjectXtraData : public LocMsg {
         delete[] mData;
     }
     inline virtual void proc() const {
+        /* expected_parts mirrors LocApiV02::setXtraData's own
+           ((length - 1) / QMI_LOC_MAX_PREDICTED_ORBITS_PART_LEN_V02) + 1
+           (location_service_v02.h; the part length ceiling is 1024 bytes)
+           so a part-count mismatch between this log and the adapter's own
+           QMI_LOC_INJECT_PREDICTED_ORBITS_DATA_REQ log names a length
+           change between dispatch and the adapter call, not a modem
+           artifact. */
+        LOC_LOGI("setXtraData dispatch: length=%d fnv1a=0x%08x "
+                 "magic=%02x%02x expected_parts=%d",
+                 mLen, xtra_fnv1a(mData, mLen),
+                 mLen > 0 ? (uint8_t)mData[0] : 0,
+                 mLen > 1 ? (uint8_t)mData[1] : 0,
+                 mLen > 0 ? ((mLen - 1) / 1024) + 1 : 0);
         mAdapter->setXtraData(mData, mLen);
     }
     inline  void locallog() const {
-        LOC_LOGV("length: %d\n  data: %p", mLen, mData);
+        LOC_LOGI("setXtraData queued: length=%d fnv1a=0x%08x data=%p",
+                 mLen, xtra_fnv1a(mData, mLen), mData);
     }
     inline virtual void log() const {
         locallog();
