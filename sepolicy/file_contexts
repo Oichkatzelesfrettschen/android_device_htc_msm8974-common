@@ -69,5 +69,7 @@
 /sys/devices/qpnp-vadc-(.*)?/batt_therm                                              u:object_r:sysfs_thermal:s0
 /sys/devices/qpnp-vadc-(.*)?/emmc_therm                                              u:object_r:sysfs_thermal:s0
 /sys/devices/qpnp-vadc-(.*)?/quiet_therm                                             u:object_r:sysfs_thermal:s0
+/sys/devices/virtual/thermal/thermal_zone[0-9]+(/.*)?                                u:object_r:sysfs_thermal:s0
+/sys/devices/virtual/thermal/cooling_device[0-9]+(/.*)?                              u:object_r:sysfs_thermal:s0
 /sys/module/htc_bdaddress/parameters/bdaddress                                       u:object_r:sysfs_bluetooth_writable:s0
 /dev/time_helper                                                                     u:object_r:time_helper_device:s0

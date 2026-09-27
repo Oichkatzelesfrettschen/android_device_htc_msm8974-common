@@ -258,6 +258,17 @@ PRODUCT_PACKAGES += \
     android.hardware.power-service-qti \
     android.hardware.power.stats@1.0-service.mock
 
+# Thermal: hardware/google/pixel's AIDL thermal HAL, config-driven, reused
+# unmodified per hardware/google/pixel/thermal/README and LineageOS's own
+# sm6250-common/exynos9820-common precedent; the JSON below names this
+# board's 11 tsens zones and the shutdown-only mitigation
+# thermal-engine-8974.conf shipped for the 4 CPU zones.
+PRODUCT_PACKAGES += \
+    android.hardware.thermal-service.pixel
+
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/thermal/thermal_info_config.json:$(TARGET_COPY_OUT_VENDOR)/etc/thermal_info_config.json
+
 # Protobuf
 PRODUCT_PACKAGES += \
     libprotobuf-cpp-full-vendorcompat \
