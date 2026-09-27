@@ -78,6 +78,15 @@
                              samplingRates="8000,16000"
                              channelMasks="AUDIO_CHANNEL_OUT_MONO"/>
                 </mixPort>
+                <mixPort name="direct_pcm" role="source"
+                         flags="AUDIO_OUTPUT_FLAG_DIRECT">
+                    <profile name="" format="AUDIO_FORMAT_PCM_24_BIT_PACKED"
+                             samplingRates="44100,48000,88200,96000,176400,192000"
+                             channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
+                    <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
+                             samplingRates="44100,48000,88200,96000,176400,192000"
+                             channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
+                </mixPort>
                 <!-- Stock's "tunnel" profile (stock audio_policy.conf, KitKat
                      2.16.651.4): AUDIO_OUTPUT_FLAG_TUNNEL has no modern
                      equivalent (not in system/media/audio's flag enum) and is
@@ -122,10 +131,16 @@
                 <devicePort tagName="Wired Headset" type="AUDIO_DEVICE_OUT_WIRED_HEADSET" role="sink">
                     <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
                              samplingRates="48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
+                    <profile name="" format="AUDIO_FORMAT_PCM_24_BIT_PACKED"
+                             samplingRates="44100,48000,88200,96000,176400,192000"
+                             channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
                 </devicePort>
                 <devicePort tagName="Wired Headphones" type="AUDIO_DEVICE_OUT_WIRED_HEADPHONE" role="sink">
                     <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
                              samplingRates="48000" channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
+                    <profile name="" format="AUDIO_FORMAT_PCM_24_BIT_PACKED"
+                             samplingRates="44100,48000,88200,96000,176400,192000"
+                             channelMasks="AUDIO_CHANNEL_OUT_STEREO"/>
                 </devicePort>
                 <devicePort tagName="Line" type="AUDIO_DEVICE_OUT_LINE" role="sink">
                     <profile name="" format="AUDIO_FORMAT_PCM_16_BIT"
@@ -191,9 +206,9 @@
                 <route type="mix" sink="Speaker"
                        sources="primary output,deep_buffer,voip_rx,compress_offload"/>
                 <route type="mix" sink="Wired Headset"
-                       sources="primary output,deep_buffer,voip_rx,compress_offload"/>
+                       sources="primary output,deep_buffer,voip_rx,compress_offload,direct_pcm"/>
                 <route type="mix" sink="Wired Headphones"
-                       sources="primary output,deep_buffer,voip_rx,compress_offload"/>
+                       sources="primary output,deep_buffer,voip_rx,compress_offload,direct_pcm"/>
                 <route type="mix" sink="Line"
                        sources="primary output,deep_buffer,voip_rx,compress_offload"/>
                 <route type="mix" sink="HDMI"
