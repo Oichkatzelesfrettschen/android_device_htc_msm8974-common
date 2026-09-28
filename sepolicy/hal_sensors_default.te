@@ -1,3 +1,8 @@
 allow hal_sensors_default sensors_data_file:dir rw_dir_perms;
 allow hal_sensors_default sensors_data_file:file create_file_perms;
 allow hal_sensors_default sensors_data_file:lnk_file r_file_perms;
+
+# The AIDL multihal resolves the ISensorsCallback that system_server passes to
+# initialize() with a binder transaction back to system_server; CAF's vendor
+# hal_sensors_default policy grants the same call.
+binder_call(hal_sensors_default, system_server)
