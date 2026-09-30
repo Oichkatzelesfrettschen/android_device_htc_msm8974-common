@@ -18,6 +18,14 @@
  * mpdecision's hotplug decisions. hispeed_freq, set in init.qcom.power.rc,
  * is the boost floor.
  *
+ * The same INTERACTION and LAUNCH windows hold the Adreno at its top power
+ * level through kgsl-3d0/min_pwrlevel. The msm-adreno-tz governor idles the
+ * GPU at a low level and ramps only after its sampling window, so the first
+ * frames of a launch or a home transition miss their deadline (htc-workbench
+ * evidence ui-transition-gpu-floor-110-20260929). kgsl has no boost pulse of
+ * its own, so a HAL thread writes kgsl's idle floor, the lowest of
+ * num_pwrlevels levels, back when the window ends.
+ *
  * LOW_POWER drops every boost and sets vendor.power.low_power, on which
  * init.qcom.power.rc turns the cpu_boost input boost off and back on. The
  * property outlives this process, so a restarted HAL reads its low-power
@@ -28,9 +36,12 @@
 
 #include <algorithm>
 #include <chrono>
+#include <condition_variable>
 #include <cstdint>
+#include <cstdlib>
 #include <mutex>
 #include <string>
+#include <thread>
 
 #include <aidl/android/hardware/power/Mode.h>
 #include <android-base/file.h>
@@ -73,6 +84,23 @@ int64_t gPulseEndUs = 0;
 // Last value written to boostpulse_duration; -1 forces the first write.
 int64_t gPulseDurationUs = -1;
 
+constexpr const char* kGpuMinPwrlevelPath =
+        "/sys/devices/fdb00000.qcom,kgsl-3d0/kgsl/kgsl-3d0/min_pwrlevel";
+constexpr const char* kGpuNumPwrlevelsPath =
+        "/sys/devices/fdb00000.qcom,kgsl-3d0/kgsl/kgsl-3d0/num_pwrlevels";
+// kgsl power level 0 is the Adreno 330's top clock, 578 MHz.
+constexpr int kGpuBoostLevel = 0;
+// kgsl's own idle floor, num_pwrlevels - 1, read on the first boost. It is
+// derived rather than read from min_pwrlevel, which a HAL restarted inside a
+// window would find at the boost level. -1 after a failed read disables the
+// GPU floor for this process.
+int gGpuIdleLevel = -1;
+bool gGpuIdleLevelRead = false;
+// steady_clock end of the GPU floor window; 0 while the idle floor holds.
+int64_t gGpuEndUs = 0;
+std::condition_variable gGpuWindowChanged;
+bool gGpuReleaserStarted = false;
+
 int64_t nowUs() {
     return std::chrono::duration_cast<std::chrono::microseconds>(
                    std::chrono::steady_clock::now().time_since_epoch())
@@ -93,6 +121,63 @@ void loadStateLocked() {
     gStateLoaded = true;
 }
 
+void writeGpuFloorLocked(int level) {
+    writeNode(kGpuMinPwrlevelPath, std::to_string(level));
+}
+
+// Runs for the life of the process and returns the GPU to its idle floor when
+// the window gGpuEndUs names has passed.
+void gpuReleaseLoop() {
+    std::unique_lock<std::mutex> lock(gLock);
+    for (;;) {
+        if (gGpuEndUs == 0) {
+            gGpuWindowChanged.wait(lock);
+            continue;
+        }
+        const int64_t remainingUs = gGpuEndUs - nowUs();
+        if (remainingUs > 0) {
+            gGpuWindowChanged.wait_for(lock, std::chrono::microseconds(remainingUs));
+            continue;
+        }
+        writeGpuFloorLocked(gGpuIdleLevel);
+        gGpuEndUs = 0;
+    }
+}
+
+void gpuFloorLocked(int64_t durationUs) {
+    if (!gGpuIdleLevelRead) {
+        gGpuIdleLevelRead = true;
+        std::string levels;
+        int count = 0;
+        if (android::base::ReadFileToString(kGpuNumPwrlevelsPath, &levels)) {
+            count = std::atoi(levels.c_str());
+        }
+        if (count > kGpuBoostLevel + 1) {
+            gGpuIdleLevel = count - 1;
+        } else {
+            LOG(ERROR) << "No usable " << kGpuNumPwrlevelsPath << "; GPU floor disabled";
+        }
+    }
+    if (gGpuIdleLevel < 0) return;
+    if (!gGpuReleaserStarted) {
+        std::thread(gpuReleaseLoop).detach();
+        gGpuReleaserStarted = true;
+    }
+    const int64_t end = nowUs() + durationUs;
+    if (gGpuEndUs == 0) writeGpuFloorLocked(kGpuBoostLevel);
+    if (end > gGpuEndUs) {
+        gGpuEndUs = end;
+        gGpuWindowChanged.notify_all();
+    }
+}
+
+void endGpuFloorLocked() {
+    if (gGpuEndUs == 0) return;
+    writeGpuFloorLocked(gGpuIdleLevel);
+    gGpuEndUs = 0;
+    gGpuWindowChanged.notify_all();
+}
+
 void pulseLocked(int64_t durationUs) {
     const int64_t now = nowUs();
     if (gPulseEndUs - now >= durationUs - kRepulseGuardUs) return;
@@ -106,6 +191,7 @@ void pulseLocked(int64_t durationUs) {
 
 void endPulseLocked() {
     gLaunchActive = false;
+    endGpuFloorLocked();
     if (gPulseEndUs <= nowUs()) return;
     if (writeNode(kBoostPath, "0")) gPulseEndUs = 0;
 }
@@ -119,6 +205,7 @@ void boostInteraction(int32_t durationMs) {
             durationMs > 0 ? std::min<int64_t>(int64_t{durationMs} * 1000, kInteractionMaxUs)
                            : kInteractionDefaultUs;
     pulseLocked(durationUs);
+    gpuFloorLocked(durationUs);
 }
 
 void setLaunch(bool enabled) {
@@ -130,6 +217,7 @@ void setLaunch(bool enabled) {
         if (gLowPower) return;
         gLaunchActive = true;
         pulseLocked(kLaunchUs);
+        gpuFloorLocked(kLaunchUs);
     } else if (gLaunchActive) {
         endPulseLocked();
     }
