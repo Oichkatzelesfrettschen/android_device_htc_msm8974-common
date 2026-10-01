@@ -1,0 +1,5 @@
+# Core clients resolve mounted firmware through vendor-side symlinks.
+allow domain vendor_firmware_file:dir { getattr search };
+
+# ueventd services request_firmware; vendor services read their own payloads.
+r_dir_file({ kernel ueventd tee hal_keymaster_default hal_drm hal_audio hal_nfc mm-qcamerad wcnss_service }, vendor_firmware_file)

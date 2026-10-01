@@ -14,6 +14,9 @@ type htc_perfd_data_link, file_type, data_file_type, core_data_file_type;
 # linker shim targets
 type vendor_shim_target_file, file_type, vendor_file_type;
 
+# Ordinary firmware files follow vendor ownership; mounted firmware keeps its label.
+type vendor_firmware_file, file_type, vendor_file_type;
+
 # procfs
 type proc_last_kmsg, fs_type, proc_type;
 type proc_wcnss_service, fs_type, proc_type;
