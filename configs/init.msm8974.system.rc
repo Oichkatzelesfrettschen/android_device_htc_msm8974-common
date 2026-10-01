@@ -22,6 +22,10 @@ on post-fs-data
     restorecon_recursive --force /data/vendor/location
     exec -- /system/bin/vold_prepare_subdirs migrate-vendor-data /data/misc/location /data/vendor/location 0770 1021 1021 sys.htc.vendor_data.location.ready gpsone_d 0770 1000 1021 gsiff 0770 1021 1021 mq 0770 1021 1021 quipc 0770 1021 1000 xtwifi 0770 1021 1021
 
+    # netmgrd writes fixed diagnostic children through its legacy directory.
+    # Readiness follows migration, ownership validation and final relabeling.
+    prepare_vendor_data /data/data_test /data/vendor/netmgr 0770 1001 1001 sys.htc.vendor_data.netmgr.ready
+
     # libmmcamera_imglib in mm-qcamera-daemon keeps its face album at
     # /data/fdAlbum by hardcoded path; the file lives in /data/vendor/camera.
     mkdir /data/vendor/camera 0770 camera camera
@@ -56,3 +60,7 @@ on boot
 
 on property:sys.htc.vendor_data.boot_ready=1 && property:sys.htc.vendor_data.location.ready=1
     start vendor.gnss_service
+
+# Preserve the core service boot gate while requiring prepared diagnostic data.
+on property:sys.htc.vendor_data.boot_ready=1 && property:sys.htc.vendor_data.netmgr.ready=1
+    start netmgrd

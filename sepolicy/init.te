@@ -2,3 +2,17 @@ allow init proc_last_kmsg:file { r_file_perms setattr };
 
 # init.rc writes discard_max_bytes through /dev/sys/block/by-name/userdata.
 allow init sysfs_devices_block:file w_file_perms;
+
+# Init owns root-level aliases and checked vendor data readiness.
+allow init { data_test_data_file netmgrd_data_file }:dir {
+    create getattr open read write search setattr rename reparent relabelfrom relabelto
+};
+allow init { data_test_data_file netmgrd_data_file }:{ file lnk_file fifo_file sock_file } {
+    getattr relabelfrom relabelto
+};
+allow init htc_netmgr_data_link:lnk_file {
+    create getattr read setattr relabelfrom relabelto
+};
+type_transition init vendor_data_file:dir netmgrd_data_file "netmgr";
+type_transition init system_data_root_file:lnk_file htc_netmgr_data_link "data_test";
+set_prop(init, htc_vendor_data_ready_prop)
