@@ -163,7 +163,6 @@ type ipa_vendor_data_file, file_type, data_file_type;
 
 # Port-bridge file types
 
-type fm_data_file, file_type, data_file_type;
 
 #Define the files written during the operation of mmi
 
