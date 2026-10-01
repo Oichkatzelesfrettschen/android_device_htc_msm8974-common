@@ -13,7 +13,6 @@
 # Port bridge
 
 # IPA
-/data/misc/ipa(/.*)?                                                          u:object_r:ipacm_data_file:s0
 
 # IOP
 
