@@ -4,6 +4,9 @@ type debugfs_ion, fs_type, debugfs_type;
 # drm
 type mediadrm_vendor_data_file, file_type, data_file_type;
 
+# Calibration aliases live in core data; their targets remain vendor data.
+type htc_sensor_calibration_link, file_type, data_file_type, core_data_file_type;
+
 # linker shim targets
 type vendor_shim_target_file, file_type, vendor_file_type;
 

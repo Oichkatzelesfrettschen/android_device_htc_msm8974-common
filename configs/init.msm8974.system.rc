@@ -10,7 +10,7 @@ on post-fs-data
 
     # The sensors HAL opens its calibration files under /data/misc by
     # hardcoded path. The files live in /data/vendor/sensors; the links carry
-    # sensors_data_file so the HAL can follow them.
+    # htc_sensor_calibration_link; following a link reads vendor-owned data.
     symlink /data/vendor/sensors/cw_calibrator_mag.ini /data/misc/cw_calibrator_mag.ini
     symlink /data/vendor/sensors/AccOffset.txt /data/misc/AccOffset.txt
     restorecon /data/misc/cw_calibrator_mag.ini

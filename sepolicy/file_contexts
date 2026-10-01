@@ -12,7 +12,7 @@
 /data/vendor/w(/.*)?                                                                u:object_r:mediadrm_vendor_data_file:s0
 
 # Sensors HAL calibration, reached through links at its hardcoded /data/misc paths
-/data/misc/(cw_calibrator_mag\.ini|AccOffset\.txt)                                   u:object_r:sensors_data_file:s0
+/data/misc/(cw_calibrator_mag\.ini|AccOffset\.txt) -l                                u:object_r:htc_sensor_calibration_link:s0
 /data/vendor/sensors(/.*)?                                                           u:object_r:sensors_data_file:s0
 
 # Debug

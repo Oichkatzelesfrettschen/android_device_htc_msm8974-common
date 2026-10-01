@@ -1,6 +1,7 @@
 allow hal_sensors_default sensors_data_file:dir rw_dir_perms;
 allow hal_sensors_default sensors_data_file:file create_file_perms;
 allow hal_sensors_default sensors_data_file:lnk_file r_file_perms;
+allow hal_sensors_default htc_sensor_calibration_link:lnk_file { getattr read };
 
 # The AIDL multihal resolves the ISensorsCallback that system_server passes to
 # initialize() with a binder transaction back to system_server; CAF's vendor
