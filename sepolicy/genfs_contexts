@@ -1,5 +1,5 @@
 genfscon proc /calibration u:object_r:proc_wcnss_service:s0
-genfscon proc /device-tree/firmware/android u:object_r:sysfs_dt_firmware_android:s0
+genfscon proc /device-tree/firmware/android u:object_r:proc_dt_firmware_android:s0
 genfscon proc /last_kmsg u:object_r:proc_last_kmsg:s0
 
 genfscon sysfs /android_camera_awb_cal u:object_r:sysfs_camera_awb_cal:s0

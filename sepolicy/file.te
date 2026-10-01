@@ -9,7 +9,7 @@ type vendor_shim_target_file, file_type, vendor_file_type;
 
 # procfs
 type proc_last_kmsg, fs_type, proc_type;
-type proc_wcnss_service, fs_type;
+type proc_wcnss_service, fs_type, proc_type;
 
 # sysfs
 type sysfs_camera_awb_cal, fs_type, sysfs_type;

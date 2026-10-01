@@ -1,0 +1,2 @@
+# exFAT checks the removable device's physical sector size before filesystem I/O.
+allowxperm fsck_untrusted vold_device:blk_file ioctl BLKPBSZGET;

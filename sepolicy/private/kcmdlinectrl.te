@@ -1,3 +1,4 @@
 # The platform probes the device tree for boot configuration and dontaudits the
 # directory search; the file read completes that probe on this procfs tree.
 dontaudit kcmdlinectrl sysfs_dt_firmware_android:file r_file_perms;
+dontaudit kcmdlinectrl proc_dt_firmware_android:file r_file_perms;
