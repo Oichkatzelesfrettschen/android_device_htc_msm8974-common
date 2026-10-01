@@ -177,7 +177,7 @@ type proc_dirty_ratio, fs_type, proc_type;
 type mmi_socket, file_type;
 
 # hbtp config file
-type hbtp_cfg_file, file_type;
+type hbtp_cfg_file, file_type, vendor_file_type;
 type hbtp_log_file, file_type, data_file_type;
 
 #Define the files written during the operation of usf
