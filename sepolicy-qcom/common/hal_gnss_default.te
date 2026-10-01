@@ -9,11 +9,12 @@
 dontaudit hal_gnss_default self:udp_socket create;
 
 # The legacy GNSS HAL (loc_api in gps.msm8974) reaches the modem through
-# qmuxd and netmgrd, keeps its message queues in /data/misc/location, and
+# qmuxd and netmgrd, follows /data/misc/location into vendor data, and
 # probes sysfs for the SoC and modem type.
 allow hal_gnss location_data_file:dir rw_dir_perms;
 allow hal_gnss location_data_file:file create_file_perms;
 allow hal_gnss location_data_file:sock_file { create unlink };
+allow hal_gnss htc_location_data_link:lnk_file { getattr read };
 netmgr_socket(hal_gnss)
 qmux_socket(hal_gnss)
 vndbinder_use(hal_gnss)

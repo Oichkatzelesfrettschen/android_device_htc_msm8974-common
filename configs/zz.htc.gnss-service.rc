@@ -1,0 +1,8 @@
+# Explicit readiness starts the GNSS service. Omitting an init interface
+# mapping prevents HIDL's lazy-start request from bypassing data preparation.
+service vendor.gnss_service /vendor/bin/hw/android.hardware.gnss@1.0-service.legacy
+    override
+    class hal
+    user gps
+    group system gps radio
+    disabled

@@ -16,14 +16,11 @@ on post-fs-data
     restorecon /data/misc/cw_calibrator_mag.ini
     restorecon /data/misc/AccOffset.txt
 
-    # The GNSS HAL's loc_api opens its message queues under
-    # /data/misc/location by hardcoded path.
-    mkdir /data/misc/location 0770 gps gps
-    mkdir /data/misc/location/gpsone_d 0770 system gps
-    mkdir /data/misc/location/gsiff 0770 gps gps
-    mkdir /data/misc/location/mq 0770 gps gps
-    mkdir /data/misc/location/quipc 0770 gps system
-    mkdir /data/misc/location/xtwifi 0770 gps gps
+    # Move persistent GNSS state before creating children. The final helper
+    # call publishes readiness only after ownership and relabeling succeed.
+    exec -- /system/bin/vold_prepare_subdirs migrate-vendor-data /data/misc/location /data/vendor/location
+    restorecon_recursive --force /data/vendor/location
+    exec -- /system/bin/vold_prepare_subdirs migrate-vendor-data /data/misc/location /data/vendor/location 0770 1021 1021 sys.htc.vendor_data.location.ready gpsone_d 0770 1000 1021 gsiff 0770 1021 1021 mq 0770 1021 1021 quipc 0770 1021 1000 xtwifi 0770 1021 1021
 
     # libmmcamera_imglib in mm-qcamera-daemon keeps its face album at
     # /data/fdAlbum by hardcoded path; the file lives in /data/vendor/camera.
@@ -34,12 +31,14 @@ on post-fs-data
     # time_daemon keeps its RTC offset in /data/time.
     mkdir /data/time 0700 system system
 
-    # mpdecision serves its mpctl socket from /data/misc/perfd and keeps
-    # its saved tunables in /data/system/perfd.
-    mkdir /data/misc/perfd 0755 root system
-    chmod 2755 /data/misc/perfd
-    mkdir /data/system/perfd 0770 root system
-    chmod 2770 /data/system/perfd
+    # Compatibility links retain mpdecision's hardcoded paths; preparation
+    # preserves existing data and holds startup on a directory conflict.
+    exec -- /system/bin/vold_prepare_subdirs migrate-vendor-data /data/misc/perfd /data/vendor/perfd_socket
+    restorecon_recursive --force /data/vendor/perfd_socket
+    exec -- /system/bin/vold_prepare_subdirs migrate-vendor-data /data/misc/perfd /data/vendor/perfd_socket 2755 0 1000 sys.htc.vendor_data.perfd_socket.ready
+    exec -- /system/bin/vold_prepare_subdirs migrate-vendor-data /data/system/perfd /data/vendor/perfd
+    restorecon_recursive --force /data/vendor/perfd
+    exec -- /system/bin/vold_prepare_subdirs migrate-vendor-data /data/system/perfd /data/vendor/perfd 2770 0 1000 sys.htc.vendor_data.perfd.ready
 
 # The swcodec APEX carries a linker config that resolves its HAL clients
 # through namespaces this device's legacy blobs do not satisfy; the system
@@ -53,3 +52,7 @@ on property:apexd.status=ready
 # partition mounts, so it is unconditionally ready.
 on boot
     setprop vendor.thermal.link_ready 1
+    setprop sys.htc.vendor_data.boot_ready 1
+
+on property:sys.htc.vendor_data.boot_ready=1 && property:sys.htc.vendor_data.location.ready=1
+    start vendor.gnss_service

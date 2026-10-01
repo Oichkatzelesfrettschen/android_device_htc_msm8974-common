@@ -1,0 +1,24 @@
+# Init prepares aliases before their vendor producers start.
+domain_auto_trans(init, vold_prepare_subdirs_exec, vold_prepare_subdirs)
+set_prop(vold_prepare_subdirs, htc_vendor_data_ready_prop)
+
+# perfd directories retain setgid after assignment to the system group.
+allow vold_prepare_subdirs self:global_capability_class_set fsetid;
+
+allow vold_prepare_subdirs { location_data_file mpctl_data_file mpctl_socket }:dir {
+    create getattr open read write search setattr rename reparent relabelfrom relabelto
+};
+allow vold_prepare_subdirs { location_data_file mpctl_data_file mpctl_socket }:{ file lnk_file fifo_file } {
+    getattr relabelfrom relabelto
+};
+allow vold_prepare_subdirs { location_data_file mpctl_data_file mpctl_socket }:sock_file getattr;
+allow vold_prepare_subdirs location_data_file:dir add_name;
+allow vold_prepare_subdirs { htc_location_data_link htc_perfd_data_link }:lnk_file {
+    create getattr read setattr relabelfrom relabelto
+};
+
+type_transition vold_prepare_subdirs vendor_data_file:dir location_data_file "location";
+type_transition vold_prepare_subdirs vendor_data_file:dir mpctl_data_file "perfd";
+type_transition vold_prepare_subdirs vendor_data_file:dir mpctl_socket "perfd_socket";
+type_transition vold_prepare_subdirs system_data_file:lnk_file htc_location_data_link "location";
+type_transition vold_prepare_subdirs system_data_file:lnk_file htc_perfd_data_link "perfd";
