@@ -75,6 +75,9 @@ on post-fs-data
 
     mkdir /data/vendor/sensors 0770 system system
 
+    # HWC layer and virtual-display dumps use vendor-owned diagnostic storage.
+    mkdir /data/vendor/display 0770 system graphics
+
     # Widevine L3 CDM storage; libwvdrmengine.so names /data/vendor/w/IDM<uid>
     mkdir /data/vendor/w 0770 media mediadrm
 
