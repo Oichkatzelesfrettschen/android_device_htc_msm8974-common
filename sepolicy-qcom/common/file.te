@@ -192,9 +192,6 @@ type adsprpcd_file, file_type, mlstrustedobject;
 
 #mdtp_svc_app file types
 
-# subsystem_ramdump files
-type ssr_ramdump_data_file, file_type, data_file_type;
-
 # Regionalization files
 type regionalization_file, file_type;
 

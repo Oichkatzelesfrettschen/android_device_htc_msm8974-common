@@ -48,10 +48,6 @@ userdebug_or_eng(`
 
   diag_use(system_app)
 
-  # allow to read ssr ramdump
-  allow system_app ssr_ramdump_data_file:dir r_dir_perms;
-  allow system_app ssr_ramdump_data_file:file r_file_perms;
-
   # allow system app to read crash_prop
 ')
 
