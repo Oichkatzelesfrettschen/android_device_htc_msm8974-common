@@ -4,7 +4,6 @@
 # allow application to access dpmd domain and socket
 #unix_socket_connect(appdomain, dpmwrapper, dpmd)
 
-#unix_socket_connect(appdomain, qlogd, qlogd)
 #unix_socket_send(appdomain, seempdw, seempd)
 
 #Allow all apps to open and send ioctl to qdsp device
