@@ -198,9 +198,6 @@ type ssr_ramdump_data_file, file_type, data_file_type;
 # Regionalization files
 type regionalization_file, file_type;
 
-# /data/system/swap/swapfile - swapfile
-type swap_data_file, file_type, data_file_type;
-
 # Wifi Data file
 type wifi_vendor_data_file, file_type, data_file_type;
 type wifi_vendor_wpa_socket, file_type, data_file_type;
