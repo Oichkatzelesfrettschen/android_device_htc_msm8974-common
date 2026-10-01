@@ -20,9 +20,6 @@ hal_client_domain(platform_app, hal_hbtp)
 #for perf-hal call
 hal_client_domain(platform_app, hal_perf)
 
-#for iop-hal call
-hal_client_domain(platform_app, hal_iop)
-
 #fm
 hal_client_domain(platform_app, vendor_hal_fm);
 allow platform_app fm_radio_device:chr_file r_file_perms;

@@ -114,7 +114,6 @@
 /dev/socket/ims_qmid                            u:object_r:ims_socket:s0
 /dev/socket/ims_datad                           u:object_r:ims_socket:s0
 /dev/socket/gamed                               u:object_r:gamed_socket:s0
-/dev/socket/iop                                 u:object_r:iop_socket:s0
 /dev/socket/qlogd                               u:object_r:qlogd_socket:s0
 /dev/socket/ipacm_log_file                      u:object_r:ipacm_socket:s0
 #/dev/socket/dpmd                                u:object_r:dpmd_socket:s0
@@ -359,7 +358,6 @@
 /data(/vendor)?/time(/.*)?                                          u:object_r:time_data_file:s0
 /data/nfc(/.*)?                                                     u:object_r:nfc_data_file:s0
 /data/vendor/perfd(/.*)?                                            u:object_r:mpctl_data_file:s0
-/data/vendor/iop(/.*)?                                                u:object_r:iop_data_file:s0
 /data/vendor/lm(/.*)?                                               u:object_r:lm_data_file:s0
 /data/vendor/display(/.*)?                                          u:object_r:display_vendor_data_file:s0
 /data/vendor/ipa(/.*)?                                              u:object_r:ipa_vendor_data_file:s0

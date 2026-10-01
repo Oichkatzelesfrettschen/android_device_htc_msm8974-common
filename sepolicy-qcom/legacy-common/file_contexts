@@ -16,7 +16,6 @@
 /data/misc/ipa(/.*)?                                                          u:object_r:ipacm_data_file:s0
 
 # IOP
-/data/misc/iop(/.*)?                                                          u:object_r:iop_data_file:s0
 
 # Battery
 /sys/devices(/platform)?/soc\.0/qpnp-fg-[a-z0-9]+/power_supply/bms(/.*)?      u:object_r:sysfs_battery_supply:s0
