@@ -148,16 +148,18 @@
     -->
     <bool name="config_enableWifiDisplay">true</bool>
 
-    <!-- GnssPsdsDownloader fetches predicted orbits only from LONGTERM_PSDS_SERVER_1..3
-         and advances to the next server on every download, so the HAL's XTRA retry
-         walks this list. The XTRA_SERVER_* keys in gps.conf feed the HAL's
-         report_xtra_server_cb, which IGnssXtraCallback 1.0 does not carry.
+    <!-- GnssPsdsDownloader fetches predicted orbits only from LONGTERM_PSDS_SERVER_1..3.
+         GnssLocationProvider builds a new downloader for every HAL download request,
+         and each one starts at a random server and moves on only past a failed HTTP
+         fetch, so every XTRA retry draws its server at random from this list. The
+         XTRA_SERVER_* keys in gps.conf feed the HAL's report_xtra_server_cb, which
+         IGnssXtraCallback 1.0 does not carry.
          The MSM8974 modem's setXtraData loads XTRA2 (header byte 1 = 0x34) and XTRA3
          (0x32) files alike, and libloc_eng accepts a file by the validity window it
          loads. The izatcloud mirrors serve either generation under either file name;
          an XTRA2 file's GPS week bytes 15-16 select its window: era byte 0x09 loads
          the current week, 0x05 a window 1024 weeks earlier, which the HAL rejects
-         and retries on the next server. -->
+         and retries. -->
     <string-array name="config_gnssParameters" translatable="false">
         <item>LONGTERM_PSDS_SERVER_1=https://xtrapath2.izatcloud.net/xtra3grc.bin</item>
         <item>LONGTERM_PSDS_SERVER_2=https://xtrapath3.izatcloud.net/xtra3grc.bin</item>
