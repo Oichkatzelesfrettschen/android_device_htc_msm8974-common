@@ -4,3 +4,6 @@ get_prop(netmgrd, vendor_qcom_data_prop)
 # (netmgr_kif_set_addr_prop); the platform owns net.* and resolves DNS
 # through netd, so the store fails and netmgrd logs it and continues.
 dontaudit netmgrd { net_radio_prop system_prop }:property_service set;
+
+# Fixed diagnostic children resolve through the legacy directory alias.
+allow netmgrd htc_netmgr_data_link:lnk_file { getattr read };

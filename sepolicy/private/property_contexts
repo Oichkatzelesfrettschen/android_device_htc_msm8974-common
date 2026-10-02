@@ -1,0 +1,6 @@
+sys.htc.vendor_data.location.ready      u:object_r:htc_vendor_data_ready_prop:s0 exact bool
+sys.htc.vendor_data.perfd_socket.ready  u:object_r:htc_vendor_data_ready_prop:s0 exact bool
+sys.htc.vendor_data.perfd.ready         u:object_r:htc_vendor_data_ready_prop:s0 exact bool
+sys.htc.vendor_data.netmgr.ready        u:object_r:htc_vendor_data_ready_prop:s0 exact bool
+sys.htc.vendor_data.boot_ready          u:object_r:htc_vendor_data_boot_prop:s0 exact bool
+hw.fm.init                             u:object_r:htc_fm_init_prop:s0 exact bool

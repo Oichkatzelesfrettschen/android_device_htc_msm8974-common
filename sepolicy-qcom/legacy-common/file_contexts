@@ -1,10 +1,11 @@
 # Perfd
-/data/system/perfd(/.*)?                                                      u:object_r:mpctl_data_file:s0
+/data/system/perfd -l                                                         u:object_r:htc_perfd_data_link:s0
 /dev/socket/perfd                                                             u:object_r:mpctl_socket:s0
-/data/misc/perfd(/.*)?                                                        u:object_r:mpctl_socket:s0
+/data/misc/perfd -l                                                           u:object_r:htc_perfd_data_link:s0
+/data/vendor/perfd_socket(/.*)?                                               u:object_r:mpctl_socket:s0
 
 # Location
-/data/misc/location(/.*)?                                                     u:object_r:location_data_file:s0
+/data/misc/location -l                                                        u:object_r:htc_location_data_link:s0
 
 # IMS
 /dev/socket/ims_rtpd                                                          u:object_r:ims_socket:s0
@@ -12,10 +13,8 @@
 # Port bridge
 
 # IPA
-/data/misc/ipa(/.*)?                                                          u:object_r:ipacm_data_file:s0
 
 # IOP
-/data/misc/iop(/.*)?                                                          u:object_r:iop_data_file:s0
 
 # Battery
 /sys/devices(/platform)?/soc\.0/qpnp-fg-[a-z0-9]+/power_supply/bms(/.*)?      u:object_r:sysfs_battery_supply:s0
@@ -94,4 +93,3 @@
 /sys/devices/qcom,cpubw\.[0-9]+/devfreq/qcom,cpubw\.[0-9]+/governor           u:object_r:sysfs_devfreq:s0
 
 # Postprocessing
-/data/misc/display(/.*)?                                                      u:object_r:display_vendor_data_file:s0

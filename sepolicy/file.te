@@ -4,12 +4,23 @@ type debugfs_ion, fs_type, debugfs_type;
 # drm
 type mediadrm_vendor_data_file, file_type, data_file_type;
 
+# Calibration aliases live in core data; their targets remain vendor data.
+type htc_sensor_calibration_link, file_type, data_file_type, core_data_file_type;
+
+# Legacy daemon aliases live in core data; contents remain vendor-owned.
+type htc_location_data_link, file_type, data_file_type, core_data_file_type;
+type htc_perfd_data_link, file_type, data_file_type, core_data_file_type;
+type htc_netmgr_data_link, file_type, data_file_type, core_data_file_type;
+
 # linker shim targets
 type vendor_shim_target_file, file_type, vendor_file_type;
 
+# Ordinary firmware files follow vendor ownership; mounted firmware keeps its label.
+type vendor_firmware_file, file_type, vendor_file_type;
+
 # procfs
 type proc_last_kmsg, fs_type, proc_type;
-type proc_wcnss_service, fs_type;
+type proc_wcnss_service, fs_type, proc_type;
 
 # sysfs
 type sysfs_camera_awb_cal, fs_type, sysfs_type;

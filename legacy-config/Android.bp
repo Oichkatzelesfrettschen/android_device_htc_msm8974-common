@@ -1,0 +1,25 @@
+// Preserve paths compiled into legacy consumers; contents remain vendor-owned.
+
+install_symlink {
+    name: "htc_gnss_config_link_flp_conf",
+    installed_location: "etc/flp.conf",
+    symlink_target: "/vendor/etc/flp.conf",
+}
+
+install_symlink {
+    name: "htc_gnss_config_link_gps_conf",
+    installed_location: "etc/gps.conf",
+    symlink_target: "/vendor/etc/gps.conf",
+}
+
+install_symlink {
+    name: "htc_gnss_config_link_izat_conf",
+    installed_location: "etc/izat.conf",
+    symlink_target: "/vendor/etc/izat.conf",
+}
+
+install_symlink {
+    name: "htc_gnss_config_link_sap_conf",
+    installed_location: "etc/sap.conf",
+    symlink_target: "/vendor/etc/sap.conf",
+}

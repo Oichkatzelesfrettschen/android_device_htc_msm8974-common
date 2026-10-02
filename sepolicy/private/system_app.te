@@ -1,0 +1,2 @@
+# Qualcomm's no-firmware JNI backend sets readiness on Iris open and close.
+set_prop(system_app, htc_fm_init_prop)

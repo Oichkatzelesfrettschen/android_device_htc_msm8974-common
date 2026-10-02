@@ -1,0 +1,2 @@
+# The system FMRadio JNI backend owns the Iris open/close readiness flag.
+system_internal_prop(htc_fm_init_prop)

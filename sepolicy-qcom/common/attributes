@@ -70,10 +70,6 @@ attribute hal_esepowermanager;
 attribute hal_esepowermanager_client;
 attribute hal_esepowermanager_server;
 
-attribute hal_iop;
-attribute hal_iop_client;
-attribute hal_iop_server;
-
 attribute hal_voiceprint;
 attribute hal_voiceprint_server;
 attribute hal_voiceprint_client;

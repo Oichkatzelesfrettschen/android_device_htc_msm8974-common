@@ -24,7 +24,6 @@
 /dev/sp_keymaster                               u:object_r:sp_keymaster_device:s0
 /dev/cryptoapp                                  u:object_r:cryptoapp_device:s0
 /dev/spdaemon_ssr                               u:object_r:spdaemon_ssr_device:s0
-/dev/qsee_ipc_irq_spss                          u:object_r:qsee_ipc_irq_spss_device:s0
 /dev/radio0                                     u:object_r:fm_radio_device:s0
 /dev/btpower                                    u:object_r:bt_device:s0
 /dev/rtc0                                       u:object_r:rtc_device:s0
@@ -114,9 +113,6 @@
 /dev/socket/ims_qmid                            u:object_r:ims_socket:s0
 /dev/socket/ims_datad                           u:object_r:ims_socket:s0
 /dev/socket/gamed                               u:object_r:gamed_socket:s0
-/dev/socket/iop                                 u:object_r:iop_socket:s0
-/dev/socket/qlogd                               u:object_r:qlogd_socket:s0
-/dev/socket/ipacm_log_file                      u:object_r:ipacm_socket:s0
 #/dev/socket/dpmd                                u:object_r:dpmd_socket:s0
 #/dev/socket/dpmwrapper                          u:object_r:dpmwrapper_socket:s0
 /dev/socket/pps                                 u:object_r:pps_socket:s0
@@ -348,7 +344,7 @@
 # data files
 #
 /data/vendor/nfc(/.*)?                                              u:object_r:nfc_vendor_data_file:s0
-/data/data_test(/.*)?                                               u:object_r:data_test_data_file:s0
+/data/data_test -l                                                  u:object_r:htc_netmgr_data_link:s0
 /data/diag_log(/.*)?                                                u:object_r:diag_data_file:s0
 /data/misc/sensors(/.*)?                                            u:object_r:sensors_data_file:s0
 /data/rfs.*                                                         u:object_r:rfs_file:s0
@@ -359,27 +355,19 @@
 /data(/vendor)?/time(/.*)?                                          u:object_r:time_data_file:s0
 /data/nfc(/.*)?                                                     u:object_r:nfc_data_file:s0
 /data/vendor/perfd(/.*)?                                            u:object_r:mpctl_data_file:s0
-/data/vendor/iop(/.*)?                                                u:object_r:iop_data_file:s0
 /data/vendor/lm(/.*)?                                               u:object_r:lm_data_file:s0
 /data/vendor/display(/.*)?                                          u:object_r:display_vendor_data_file:s0
-/data/vendor/ipa(/.*)?                                              u:object_r:ipa_vendor_data_file:s0
 /data/misc/qsee(/.*)?                                               u:object_r:data_qsee_file:s0
 /data/vendor/qtee(/.*)?                                             u:object_r:data_qtee_file:s0
-/data/misc/spss(/.*)?                                               u:object_r:spss_data_file:s0
 /data/vendor/location(/.*)?                                         u:object_r:location_data_file:s0
 /data/(misc|vendor)/hbtp(/.*)?                                      u:object_r:hbtp_log_file:s0
-/data/misc/qlogd(/.*)?                                              u:object_r:qlogd_data_file:s0
 /data/vendor/qti-logkit/socket-privileged(/.*)?                     u:object_r:qti_logkit_priv_socket:s0
 /data/vendor/qti-logkit/socket-public(/.*)?                         u:object_r:qti_logkit_pub_socket:s0
 /data/vendor/radio(/.*)?                                            u:object_r:vendor_radio_data_file:s0
 /data/vendor/netmgr(/.*)?                                           u:object_r:netmgrd_data_file:s0
-/data/misc/fm(/.*)?                                                 u:object_r:fm_data_file:s0
-/data/ramdump(/.*)?                                                 u:object_r:ssr_ramdump_data_file:s0
-/data/system/swap(/.*)?                                             u:object_r:swap_data_file:s0
 /data/vendor/wifi(/.*)?                                             u:object_r:wifi_vendor_data_file:s0
 /data/vendor/wifi/sockets(/.*)?                                     u:object_r:wifi_vendor_wpa_socket:s0
-/data/misc/wifi/nvbin(/.*)?                                         u:object_r:dynamic_nv_data_file:s0
-/data/vendor/wifi/wigig_sockets(/.*)?                               u:object_r:wpa_socket:s0
+/data/vendor/wifi/wigig_sockets(/.*)?                               u:object_r:wifi_vendor_wpa_socket:s0
 /data/vendor/wifi/wigig_sockets/wpa_ctrl.*                          u:object_r:wifi_vendor_wpa_socket:s0
 /data/vendor/qdmastats(/.*)?                                        u:object_r:qdma_data_file:s0
 /data/vendor/qdma(/.*)?                                             u:object_r:qdma_data_file:s0
@@ -436,7 +424,7 @@
 #
 /data/vendor/tombstones(/.*)?                                      u:object_r:vendor_tombstone_data_file:s0
 /data/vendor/misc/audio(/.*)?   u:object_r:audio_data_file:s0
-/(vendor|system/vendor)/package(/.*)?                                               u:object_r:regionalization_file:s0
+/(vendor|system/vendor)/package(/.*)?                               u:object_r:vendor_configs_file:s0
 /(vendor|system/vendor)/package(/.*)?/overlay(/.*)?                                 u:object_r:vendor_overlay_file:s0
 /(vendor|system/vendor)/package(/.*)?/app(/.*)?                                     u:object_r:vendor_app_file:s0
 
@@ -487,9 +475,9 @@
 ###################################
 # firmware images
 #
-/vendor/firmware(/.*)?                                              u:object_r:firmware_file:s0
-/system/etc/firmware(/.*)?                                          u:object_r:firmware_file:s0
-/system/vendor/firmware(/.*)?                                       u:object_r:firmware_file:s0
+/vendor/firmware(/.*)?                                              u:object_r:vendor_firmware_file:s0
+/system/etc/firmware -l                                             u:object_r:system_file:s0
+/system/vendor/firmware(/.*)?                                       u:object_r:vendor_firmware_file:s0
 /firmware(/.*)?                                                     u:object_r:firmware_file:s0
 
 /(vendor|system/vendor)/bin/grep                                    u:object_r:vendor_toolbox_exec:s0

@@ -37,9 +37,6 @@ set_prop(system_server, bluetooth_prop)
 
 # required for ANT App to connectto wcnss_filter sockets
 allow system_server bluetooth:unix_stream_socket connectto;
-# access to iop
-unix_socket_send(system_server, iop, dumpstate)
-unix_socket_connect(system_server, iop, dumpstate)
 
 # allow  system/framework applications to update the dpmd configuration files
 #unix_socket_connect(system_server, dpmd, dpmd);
@@ -150,7 +147,6 @@ hal_client_domain(system_server, hal_wigig_npt)
 allow system_server sysfs_wigig:file rw_file_perms;
 
 # allow system_server to access IOP HAL service
-hal_client_domain(system_server, hal_iop)
 
 #kgsl
 r_dir_file(system_server, kgsl_debugfs);

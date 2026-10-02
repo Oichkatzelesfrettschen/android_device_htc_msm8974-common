@@ -24,7 +24,6 @@
 
 # fm_radio app needes  open read write on fm_radio_device
 allow system_app fm_radio_device:chr_file r_file_perms;
-r_dir_file(system_app, fm_data_file);
 r_dir_file(system_app, bluetooth_data_file);
 r_dir_file(system_app, bt_firmware_file);
 
@@ -48,10 +47,6 @@ userdebug_or_eng(`
   r_dir_file(system_app, firmware_file);
 
   diag_use(system_app)
-
-  # allow to read ssr ramdump
-  allow system_app ssr_ramdump_data_file:dir r_dir_perms;
-  allow system_app ssr_ramdump_data_file:file r_file_perms;
 
   # allow system app to read crash_prop
 ')
@@ -177,7 +172,6 @@ allow system_app cache_recovery_file:file create_file_perms;
 binder_call( system_app, update_engine )
 
 hal_client_domain(system_app, hal_perf)
-hal_client_domain(system_app, hal_iop)
 
 #allow system_app access ioctl
 allowxperm system_app self:socket ioctl msm_sock_ipc_ioctls;

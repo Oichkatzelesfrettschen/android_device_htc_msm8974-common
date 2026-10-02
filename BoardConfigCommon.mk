@@ -111,8 +111,8 @@ TARGET_SCREEN_DENSITY := 480
 TARGET_FS_CONFIG_GEN := $(PLATFORM_PATH)/config.fs
 
 # FM Radio
-BOARD_HAVE_QCOM_FM := true
-TARGET_QCOM_NO_FM_FIRMWARE := true
+$(call soong_config_set,libfmjni,vendor,qcom)
+$(call soong_config_set_bool,libfmjni,no_fm_firmware,true)
 
 # hardware/qcom-caf/msm8974/media reads this flag in venc, vdec and
 # libstagefrighthw only (Android.mk in each). Unset, venc packs

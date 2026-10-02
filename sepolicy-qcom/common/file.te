@@ -43,7 +43,7 @@ type persist_secnvm_file, file_type;
 type diag_data_file, file_type, data_file_type;
 
 #file type for restricting proc read by audiod
-type proc_audiod, fs_type;
+type proc_audiod, fs_type, proc_type;
 
 #file type for irqbalance socket
 type msm_irqbalance_socket, file_type;
@@ -60,7 +60,7 @@ type sysfs_msmuart_file, sysfs_type, fs_type;
 
 # Storage RFS file types
 type rfs_file, file_type, data_file_type;
-type rfs_system_file, file_type;
+type rfs_system_file, file_type, system_file_type;
 type rfs_shared_hlos_file, file_type, data_file_type;
 
 #mm-pp-daemon file type for sysfs access
@@ -111,13 +111,6 @@ type sysfs_process_reclaim, fs_type, sysfs_type;
 #define the files writer during the operation of app state changes
 type gamed_socket, file_type;
 
-#define the files writter during the operatio of iop
-type iop_socket, file_type;
-type iop_data_file, file_type, data_file_type;
-
-# SPSS Apps images location
-type spss_data_file, file_type, data_file_type;
-
 #mm-qcamera-daemon socket
 type camera_socket, file_type;
 
@@ -148,22 +141,14 @@ type sysfs_socinfo, fs_type, sysfs_type;
 #Define the sysfs files for usb_uicc_daemon
 type sysfs_usb_uicc, sysfs_type, fs_type;
 
-type qlogd_socket, file_type, mlstrustedobject;
-type qlogd_data_file, file_type, data_file_type;
 #Defines the files (configs, dumps, etc) used by display processes
 type display_vendor_data_file, file_type, data_file_type;
 
 #Define the files for the operation of QDCM
 type persist_display_file, file_type;
 
-# IPA file types
-type ipacm_socket, file_type;
-type ipacm_data_file, file_type, data_file_type;
-type ipa_vendor_data_file, file_type, data_file_type;
-
 # Port-bridge file types
 
-type fm_data_file, file_type, data_file_type;
 
 #Define the files written during the operation of mmi
 
@@ -171,13 +156,13 @@ type fm_data_file, file_type, data_file_type;
 type bt_firmware_file, fs_type, contextmount_type;
 
 #needed by vold
-type  proc_dirty_ratio, fs_type;
+type proc_dirty_ratio, fs_type, proc_type;
 
 #File types by mmi
 type mmi_socket, file_type;
 
 # hbtp config file
-type hbtp_cfg_file, file_type;
+type hbtp_cfg_file, file_type, vendor_file_type;
 type hbtp_log_file, file_type, data_file_type;
 
 #Define the files written during the operation of usf
@@ -207,17 +192,8 @@ type adsprpcd_file, file_type, mlstrustedobject;
 
 #mdtp_svc_app file types
 
-# subsystem_ramdump files
-type ssr_ramdump_data_file, file_type, data_file_type;
-
 # Regionalization files
 type regionalization_file, file_type;
-
-# /data/system/swap/swapfile - swapfile
-type swap_data_file, file_type, data_file_type;
-
-# dynamic nv files
-type dynamic_nv_data_file, file_type, data_file_type;
 
 # Wifi Data file
 type wifi_vendor_data_file, file_type, data_file_type;

@@ -54,7 +54,6 @@ vendor.qti.hardware.fm::IFmHci                               u:object_r:hal_fm_h
 vendor.qti.hardware.wipower::IWipower                        u:object_r:hal_bluetooth_hwservice:s0
 vendor.qti.hardware.perf::IPerf                              u:object_r:hal_perf_hwservice:s0
 com.qualcomm.qti.wifidisplayhal::IHDCPSession                u:object_r:wifidisplayhalservice_hwservice:s0
-vendor.qti.hardware.iop::IIop                                u:object_r:hal_iop_hwservice:s0
 com.qualcomm.qti.wifidisplayhal::IDSManager                  u:object_r:wifidisplayhalservice_hwservice:s0
 vendor.qti.hardware.alarm::IAlarm                            u:object_r:hal_alarm_qti_hwservice:s0
 com.qualcomm.qti.uceservice::IUceService                     u:object_r:hal_imsrcsd_hwservice:s0

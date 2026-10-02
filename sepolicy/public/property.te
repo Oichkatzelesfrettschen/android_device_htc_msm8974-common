@@ -1,0 +1,3 @@
+# Init starts legacy producers only after data preparation succeeds.
+system_internal_prop(htc_vendor_data_ready_prop)
+system_internal_prop(htc_vendor_data_boot_prop)
