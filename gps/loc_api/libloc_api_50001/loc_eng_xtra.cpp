@@ -202,7 +202,14 @@ public:
         pthread_mutex_lock(&mMutex);
         const uint64_t now = xtraRetryClockMs();
         if (!mScheduled || now + kExpirySlackMs < mDueMs) {
-            LOC_LOGI("XTRA retry expiry ignored: scheduled=%d", mScheduled);
+            /* The container pops its heap top on any expiry, and a stale
+               delegate's stop() can retire the live one, so an early
+               expiry may have consumed the schedule. start() succeeds only
+               when no delegate is live and re-arms the remaining delay. */
+            const bool rearmed = mScheduled && mActive &&
+                    start((uint32_t)(mDueMs - now), false);
+            LOC_LOGI("XTRA retry expiry ignored: scheduled=%d rearmed=%d",
+                     mScheduled, rearmed);
             pthread_mutex_unlock(&mMutex);
             return;
         }
@@ -292,7 +299,10 @@ struct LocEngInjectXtraData : public LocMsg {
     }
     inline virtual void proc() const {
         if (!xtraRetryTimer.beginInjection(mEpoch)) {
-            LOC_LOGI("XTRA injection skipped after HAL cleanup");
+            /* Queued before a cleanup: inject as the stock HAL does and
+               leave the retired retry state alone. */
+            mAdapter->setXtraData(mData, mLen);
+            LOC_LOGI("XTRA injection after HAL cleanup: no retry bookkeeping");
             return;
         }
         const XtraValidity before = queryXtraValidity();
@@ -318,7 +328,10 @@ struct LocEngInjectXtraData : public LocMsg {
                  (unsigned long long)after.startUtc, after.durationHours,
                  (unsigned long long)before.startUtc, before.durationHours,
                  after.clientStatus, after.modemStatus);
-        xtraRetryTimer.recordResult(current);
+        /* An unanswered query says nothing about the file, so it leaves
+           the retry state unchanged. */
+        if (after.answered)
+            xtraRetryTimer.recordResult(current);
         xtraRetryTimer.endInjection();
     }
     inline  void locallog() const {
@@ -375,10 +388,12 @@ int loc_eng_xtra_init (loc_eng_data_s_type &loc_eng_data,
     if(callbacks == NULL) {
         LOC_LOGE("loc_eng_xtra_init: failed, cb is NULL");
     } else {
+        /* initialize() waits out a retry callback still reading the old
+           download_request_cb before the new one is written. */
+        xtraRetryTimer.initialize(&loc_eng_data);
         xtra_module_data_ptr = &loc_eng_data.xtra_module_data;
         xtra_module_data_ptr->download_request_cb = callbacks->download_request_cb;
         xtra_module_data_ptr->report_xtra_server_cb = callbacks->report_xtra_server_cb;
-        xtraRetryTimer.initialize(&loc_eng_data);
 
         ret_val = 0;
     }

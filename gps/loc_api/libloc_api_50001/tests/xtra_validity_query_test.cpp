@@ -26,6 +26,7 @@ void checkQuery(FakeScenario scenario, uint64_t start, uint16_t hours,
     fakeLocReset(scenario, start, hours);
     const XtraValidity validity = queryXtraValidity();
     const FakeObservations observed = fakeLocObservations();
+    expect(validity.answered == (expectedClient == eLOC_CLIENT_SUCCESS), "answered");
     expect(validity.known == expectedKnown, "known");
     expect(validity.clientStatus == expectedClient, "client status");
     expect(validity.modemStatus == expectedModem, "modem status");
@@ -45,21 +46,21 @@ int main()
 {
     checkQuery(FAKE_WINDOW, kStart, 168, true, eLOC_CLIENT_SUCCESS,
                eQMI_LOC_SUCCESS_V02, 1);
-    checkQuery(FAKE_NO_WINDOW, kGpsEpoch, 168, true, eLOC_CLIENT_SUCCESS,
+    checkQuery(FAKE_EPOCH_WINDOW, kGpsEpoch, 168, true, eLOC_CLIENT_SUCCESS,
                eQMI_LOC_SUCCESS_V02, 1);
     checkQuery(FAKE_MODEM_FAILURE, kStart, 168, false, eLOC_CLIENT_SUCCESS,
                eQMI_LOC_GENERAL_FAILURE_V02, 1);
     checkQuery(FAKE_TRANSPORT_FAILURE, kStart, 168, false,
                eLOC_CLIENT_FAILURE_TIMEOUT, -1, 0);
 
-    XtraValidity window = {true, 0, 0, kStart, 168};
+    XtraValidity window = {true, true, 0, 0, kStart, 168};
     expect(xtraValidityCurrent(window, kStart), "window start is current");
     expect(xtraValidityCurrent(window, kStart + 168u * 3600u - 1u),
            "last second is current");
     expect(!xtraValidityCurrent(window, kStart + 168u * 3600u),
            "window end is not current");
     expect(!xtraValidityCurrent(window, kStart - 1u), "before start is not current");
-    XtraValidity epoch = {true, 0, 0, kGpsEpoch, 168};
+    XtraValidity epoch = {true, true, 0, 0, kGpsEpoch, 168};
     expect(!xtraValidityCurrent(epoch, kStart), "GPS-epoch default is not current");
     window.known = false;
     expect(!xtraValidityCurrent(window, kStart), "unknown window is not current");

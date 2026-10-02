@@ -5,7 +5,7 @@
 
 enum FakeScenario {
     FAKE_WINDOW,
-    FAKE_NO_WINDOW,
+    FAKE_EPOCH_WINDOW,
     FAKE_MODEM_FAILURE,
     FAKE_TRANSPORT_FAILURE
 };

@@ -94,7 +94,7 @@ void errorCallback(locClientHandleType, locClientErrorEnumType error, void*)
    stays on the production client. */
 XtraValidity queryXtraValidity()
 {
-    XtraValidity result = {false, -1, -1, 0, 0};
+    XtraValidity result = {false, false, -1, -1, 0, 0};
     pthread_once(&gClientInitOnce, initializeClientFunctions);
     if (!gClientFunctions.ready)
         return result;
@@ -121,6 +121,7 @@ XtraValidity queryXtraValidity()
             QMI_LOC_GET_PREDICTED_ORBITS_DATA_VALIDITY_IND_V02, &indication);
     result.clientStatus = clientStatus;
     if (clientStatus == eLOC_CLIENT_SUCCESS) {
+        result.answered = true;
         result.modemStatus = indication.status;
         if (indication.status == eQMI_LOC_SUCCESS_V02 &&
                 indication.validityInfo_valid) {

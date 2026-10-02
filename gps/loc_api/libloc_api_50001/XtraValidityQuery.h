@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 struct XtraValidity {
+    bool answered;
     bool known;
     int clientStatus;
     int modemStatus;
