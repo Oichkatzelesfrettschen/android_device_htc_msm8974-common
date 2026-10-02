@@ -140,10 +140,17 @@ XtraInjectionResult injectXtraWithModemStatus(const char* data, int length)
                 requestUnion, kRequestTimeoutMs,
                 QMI_LOC_INJECT_PREDICTED_ORBITS_DATA_IND_V02, &indication);
         result.clientStatus = clientStatus;
-        result.modemStatus = indication.status;
         result.partNumber = part;
-        if (clientStatus != eLOC_CLIENT_SUCCESS ||
-                indication.status != eQMI_LOC_SUCCESS_V02 ||
+        if (clientStatus != eLOC_CLIENT_SUCCESS) {
+            /* No indication arrived for this part, so its modem status is
+               unknown rather than the previous part's result. */
+            result.modemStatus = -1;
+            ALOGE("XTRA QMI injection transport failure: part=%u/%u client=%d",
+                  part, totalParts, clientStatus);
+            break;
+        }
+        result.modemStatus = indication.status;
+        if (indication.status != eQMI_LOC_SUCCESS_V02 ||
                 (indication.partNum_valid && indication.partNum != part)) {
             ALOGE("XTRA QMI injection rejected: part=%u/%u client=%d modem=%d indication_part=%u",
                   part, totalParts, clientStatus, indication.status,

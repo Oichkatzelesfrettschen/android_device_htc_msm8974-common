@@ -43,30 +43,70 @@
 
 using namespace loc_core;
 
-static time_t xtraRetryClockSeconds()
+static uint64_t xtraRetryClockMs()
 {
     struct timespec now;
     clock_gettime(CLOCK_BOOTTIME, &now);
-    return now.tv_sec;
+    return (uint64_t)now.tv_sec * 1000u + (uint64_t)now.tv_nsec / 1000000u;
 }
 
+/* The framework download callback runs on the adapter's MsgTask, the thread
+   loc_eng_init creates through the framework's create_thread_cb, the same
+   thread LocEngRequestXtra uses for the modem's own fresh-orbit request. */
+struct LocEngXtraRetryRequest : public LocMsg {
+    loc_eng_data_s_type* const mLocEng;
+    const unsigned int mEpoch;
+    const unsigned int mRetry;
+    inline LocEngXtraRetryRequest(loc_eng_data_s_type* locEng,
+                                  unsigned int epoch, unsigned int retry) :
+        LocMsg(), mLocEng(locEng), mEpoch(epoch), mRetry(retry)
+    {
+        locallog();
+    }
+    virtual void proc() const;
+    inline void locallog() const {
+        LOC_LOGV("LocEngXtraRetryRequest: retry=%u/3", mRetry);
+    }
+    inline virtual void log() const {
+        locallog();
+    }
+};
+
 class XtraRetryTimer : public LocTimer {
+    /* LocTimerDelegate::expire() clears the timer under its own lock and
+       calls timeOutCallback() after releasing it, so an accepted injection
+       or a reschedule can land between the two. mDueMs identifies the
+       schedule the callback belongs to; a callback that arrives before it
+       belongs to a stopped schedule. */
+    static const uint64_t kExpirySlackMs = 1000;
     pthread_mutex_t mMutex;
     pthread_cond_t mCallbackDone;
-    gps_xtra_download_request mCallback;
+    loc_eng_data_s_type* mLocEng;
     unsigned int mRetriesRequested;
     bool mScheduled;
+    uint64_t mDueMs;
     bool mActive;
-    time_t mLastRetry;
+    uint64_t mLastRetryMs;
     bool mCallbackRunning;
     bool mInjectionRunning;
     unsigned int mEpoch;
 
+    void retireLocked() {
+        mActive = false;
+        ++mEpoch;
+        mLocEng = NULL;
+        mRetriesRequested = 0;
+        mScheduled = false;
+        stop();
+        while (mCallbackRunning || mInjectionRunning)
+            pthread_cond_wait(&mCallbackDone, &mMutex);
+    }
+
 public:
-    XtraRetryTimer() : mCallback(NULL), mRetriesRequested(0),
-                       mScheduled(false), mActive(false), mLastRetry(0),
-                       mCallbackRunning(false), mInjectionRunning(false),
-                       mEpoch(0) {
+    XtraRetryTimer() : mLocEng(NULL), mRetriesRequested(0),
+                       mScheduled(false), mDueMs(0), mActive(false),
+                       mLastRetryMs(0), mCallbackRunning(false),
+                       mInjectionRunning(false), mEpoch(0) {
         pthread_mutex_init(&mMutex, NULL);
         pthread_cond_init(&mCallbackDone, NULL);
     }
@@ -77,31 +117,17 @@ public:
         pthread_mutex_destroy(&mMutex);
     }
 
-    void initialize(gps_xtra_download_request callback) {
+    void initialize(loc_eng_data_s_type* locEng) {
         pthread_mutex_lock(&mMutex);
-        mActive = false;
-        ++mEpoch;
-        mCallback = NULL;
-        mRetriesRequested = 0;
-        mScheduled = false;
-        stop();
-        while (mCallbackRunning || mInjectionRunning)
-            pthread_cond_wait(&mCallbackDone, &mMutex);
+        retireLocked();
         mActive = true;
-        mCallback = callback;
+        mLocEng = locEng;
         pthread_mutex_unlock(&mMutex);
     }
 
     void cleanup() {
         pthread_mutex_lock(&mMutex);
-        mActive = false;
-        ++mEpoch;
-        mCallback = NULL;
-        mRetriesRequested = 0;
-        mScheduled = false;
-        stop();
-        while (mCallbackRunning || mInjectionRunning)
-            pthread_cond_wait(&mCallbackDone, &mMutex);
+        retireLocked();
         pthread_mutex_unlock(&mMutex);
     }
 
@@ -113,15 +139,17 @@ public:
                 stop();
                 mScheduled = false;
                 mRetriesRequested = 0;
-            } else if (!mScheduled && mCallback != NULL) {
-                const time_t now = xtraRetryClockSeconds();
-                if (mRetriesRequested == 3 && now - mLastRetry >= 3600)
+            } else if (!mScheduled && mLocEng != NULL) {
+                const uint64_t now = xtraRetryClockMs();
+                if (mRetriesRequested == 3 && now - mLastRetryMs >= 3600000u)
                     mRetriesRequested = 0;
                 if (mRetriesRequested < 3) {
-                    mScheduled = start(delaysMs[mRetriesRequested], false);
+                    const uint32_t delay = delaysMs[mRetriesRequested];
+                    mScheduled = start(delay, false);
                     if (mScheduled) {
+                        mDueMs = now + delay;
                         LOC_LOGI("XTRA retry scheduled: delay_ms=%u retry=%u/3",
-                                 delaysMs[mRetriesRequested], mRetriesRequested + 1);
+                                 delay, mRetriesRequested + 1);
                     } else {
                         LOC_LOGE("XTRA retry timer failed to start");
                     }
@@ -154,29 +182,62 @@ public:
         pthread_mutex_unlock(&mMutex);
     }
 
+    bool beginRetryCallback(unsigned int epoch) {
+        pthread_mutex_lock(&mMutex);
+        const bool current = mActive && mEpoch == epoch;
+        if (current)
+            mCallbackRunning = true;
+        pthread_mutex_unlock(&mMutex);
+        return current;
+    }
+
+    void endRetryCallback() {
+        pthread_mutex_lock(&mMutex);
+        mCallbackRunning = false;
+        pthread_cond_broadcast(&mCallbackDone);
+        pthread_mutex_unlock(&mMutex);
+    }
+
     virtual void timeOutCallback() {
         pthread_mutex_lock(&mMutex);
-        mScheduled = false;
-        if (mActive && mCallback != NULL && mRetriesRequested < 3) {
-            ++mRetriesRequested;
-            mLastRetry = xtraRetryClockSeconds();
-            mCallbackRunning = true;
-            gps_xtra_download_request callback = mCallback;
-            LOC_LOGI("XTRA retry requesting download: retry=%u/3",
-                     mRetriesRequested);
-            pthread_mutex_unlock(&mMutex);
-            callback();
-            pthread_mutex_lock(&mMutex);
-            mCallbackRunning = false;
-            pthread_cond_broadcast(&mCallbackDone);
+        const uint64_t now = xtraRetryClockMs();
+        if (!mScheduled || now + kExpirySlackMs < mDueMs) {
+            LOC_LOGI("XTRA retry expiry ignored: scheduled=%d", mScheduled);
             pthread_mutex_unlock(&mMutex);
             return;
+        }
+        mScheduled = false;
+        if (mActive && mLocEng != NULL && mLocEng->adapter != NULL &&
+                mRetriesRequested < 3) {
+            ++mRetriesRequested;
+            mLastRetryMs = now;
+            LOC_LOGI("XTRA retry requesting download: retry=%u/3",
+                     mRetriesRequested);
+            mLocEng->adapter->sendMsg(new LocEngXtraRetryRequest(
+                    mLocEng, mEpoch, mRetriesRequested));
         }
         pthread_mutex_unlock(&mMutex);
     }
 };
 
 static XtraRetryTimer xtraRetryTimer;
+
+void LocEngXtraRetryRequest::proc() const
+{
+    if (!xtraRetryTimer.beginRetryCallback(mEpoch)) {
+        LOC_LOGI("XTRA retry skipped after HAL cleanup: retry=%u/3", mRetry);
+        return;
+    }
+    gps_xtra_download_request callback =
+            mLocEng->xtra_module_data.download_request_cb;
+    if (callback != NULL) {
+        CALLBACK_LOG_CALLFLOW("download_request_cb", %p, mLocEng);
+        callback();
+    } else {
+        LOC_LOGE("XTRA retry has no download callback: retry=%u/3", mRetry);
+    }
+    xtraRetryTimer.endRetryCallback();
+}
 
 void loc_eng_xtra_cleanup()
 {
@@ -306,7 +367,7 @@ int loc_eng_xtra_init (loc_eng_data_s_type &loc_eng_data,
         xtra_module_data_ptr = &loc_eng_data.xtra_module_data;
         xtra_module_data_ptr->download_request_cb = callbacks->download_request_cb;
         xtra_module_data_ptr->report_xtra_server_cb = callbacks->report_xtra_server_cb;
-        xtraRetryTimer.initialize(callbacks->download_request_cb);
+        xtraRetryTimer.initialize(&loc_eng_data);
 
         ret_val = 0;
     }

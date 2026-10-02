@@ -52,7 +52,7 @@ int main()
     checkScenario(FAKE_REJECT_FINAL, data, false, eLOC_CLIENT_SUCCESS,
                   eQMI_LOC_INVALID_PARAMETER_V02, 3, 3);
     checkScenario(FAKE_TRANSPORT_FAILURE, data, false,
-                  eLOC_CLIENT_FAILURE_TIMEOUT, eQMI_LOC_SUCCESS_V02, 2, 2);
+                  eLOC_CLIENT_FAILURE_TIMEOUT, -1, 2, 2);
     checkScenario(FAKE_PART_MISMATCH, data, false, eLOC_CLIENT_SUCCESS,
                   eQMI_LOC_SUCCESS_V02, 2, 2);
 
