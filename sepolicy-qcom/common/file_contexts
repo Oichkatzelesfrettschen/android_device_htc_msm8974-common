@@ -345,11 +345,7 @@
 #
 /data/vendor/nfc(/.*)?                                              u:object_r:nfc_vendor_data_file:s0
 /data/data_test -l                                                  u:object_r:htc_netmgr_data_link:s0
-/data/diag_log(/.*)?                                                u:object_r:diag_data_file:s0
-/data/rfs.*                                                         u:object_r:rfs_file:s0
-/data/hlos_rfs(/.*)?                                                u:object_r:rfs_shared_hlos_file:s0
 /data/vendor/misc/qti_fp(/.*)?                                      u:object_r:qfp-daemon_data_file:s0
-/data/misc/qvop(/.*)?                                               u:object_r:qvop-daemon_data_file:s0
 /data(/vendor)?/time(/.*)?                                          u:object_r:time_data_file:s0
 /data/nfc(/.*)?                                                     u:object_r:nfc_data_file:s0
 /data/vendor/perfd(/.*)?                                            u:object_r:mpctl_data_file:s0
@@ -417,7 +413,6 @@
 # vendor files
 #
 /data/vendor/tombstones(/.*)?                                      u:object_r:vendor_tombstone_data_file:s0
-/data/vendor/misc/audio(/.*)?   u:object_r:audio_data_file:s0
 /(vendor|system/vendor)/package(/.*)?                               u:object_r:vendor_configs_file:s0
 /(vendor|system/vendor)/package(/.*)?/overlay(/.*)?                                 u:object_r:vendor_overlay_file:s0
 /(vendor|system/vendor)/package(/.*)?/app(/.*)?                                     u:object_r:vendor_app_file:s0
