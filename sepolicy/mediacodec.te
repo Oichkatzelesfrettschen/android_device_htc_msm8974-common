@@ -1,1 +1,4 @@
 get_prop(mediacodec, vendor_video_prop)
+# libui probes the AIDL graphics allocator on vndbinder before the HIDL one;
+# the device provides only the HIDL allocator, so the lookup falls back.
+dontaudit mediacodec default_android_vndservice:service_manager find;

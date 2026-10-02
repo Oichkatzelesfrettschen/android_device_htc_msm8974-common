@@ -346,12 +346,10 @@
 /data/vendor/nfc(/.*)?                                              u:object_r:nfc_vendor_data_file:s0
 /data/data_test -l                                                  u:object_r:htc_netmgr_data_link:s0
 /data/diag_log(/.*)?                                                u:object_r:diag_data_file:s0
-/data/misc/sensors(/.*)?                                            u:object_r:sensors_data_file:s0
 /data/rfs.*                                                         u:object_r:rfs_file:s0
 /data/hlos_rfs(/.*)?                                                u:object_r:rfs_shared_hlos_file:s0
 /data/vendor/misc/qti_fp(/.*)?                                      u:object_r:qfp-daemon_data_file:s0
 /data/misc/qvop(/.*)?                                               u:object_r:qvop-daemon_data_file:s0
-/data/system/sensors(/.*)?                                          u:object_r:sensors_data_file:s0
 /data(/vendor)?/time(/.*)?                                          u:object_r:time_data_file:s0
 /data/nfc(/.*)?                                                     u:object_r:nfc_data_file:s0
 /data/vendor/perfd(/.*)?                                            u:object_r:mpctl_data_file:s0
@@ -371,13 +369,9 @@
 /data/vendor/wifi/wigig_sockets/wpa_ctrl.*                          u:object_r:wifi_vendor_wpa_socket:s0
 /data/vendor/qdmastats(/.*)?                                        u:object_r:qdma_data_file:s0
 /data/vendor/qdma(/.*)?                                             u:object_r:qdma_data_file:s0
-/data/vendor/ramdump/bluetooth(/.*)?                                u:object_r:bluetooth_data_file:s0
-/data/vendor/bluetooth(/.*)?                                        u:object_r:bluetooth_data_file:s0
-/data/vendor/ramdump/bluetooth/logs(/.*)?                           u:object_r:bluetooth_logs_data_file:s0
 /data/vendor/vpp(/.*)?                                              u:object_r:vpp_data_file:s0
 /data/vendor/camera(/.*)?                                           u:object_r:vendor_camera_data_file:s0
 /data/vendor/wifi/wigig_hostapd(/.*)?                               u:object_r:wigig_hostapd_socket:s0
-/data/vendor/media(/.*)?                                            u:object_r:media_data_file:s0
 /data/vendor/tloc(/.*)?                                     u:object_r:tlocd_data_file:s0
 /sys/kernel/debug/ipc_logging(/.*)?                                 u:object_r:qti_debugfs:s0
 /data/vendor/tzstorage(/.*)?                                        u:object_r:data_tzstorage_file:s0
