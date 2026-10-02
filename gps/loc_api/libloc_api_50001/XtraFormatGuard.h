@@ -11,7 +11,9 @@ enum XtraFormatStatus {
 };
 
 // The MSM8974 modem rejects generation 1 and clears loaded orbit data.
-// Validate the observed container header before any part reaches the modem.
+// Byte 0 is the container major and bytes 1 and 6 name the generation;
+// bytes 2-5 change as the servers regenerate files, so they stay
+// unchecked. Only a recognized generation 2 or 3 header reaches the modem.
 static inline XtraFormatStatus classifyXtraFormat(const void* data, size_t length)
 {
     if (data == NULL || length < 16) {
@@ -19,8 +21,7 @@ static inline XtraFormatStatus classifyXtraFormat(const void* data, size_t lengt
     }
 
     const uint8_t* bytes = static_cast<const uint8_t*>(data);
-    if (bytes[0] != 0x01 || bytes[2] != 0x08 || bytes[3] != 0x0a ||
-        bytes[4] != 0x00 || bytes[5] != 0x1a) {
+    if (bytes[0] != 0x01) {
         return XTRA_FORMAT_INVALID;
     }
 

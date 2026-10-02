@@ -41,11 +41,17 @@ static void testHeaders()
     header[0] = 0x00;
     expectStatus("bad major", header, sizeof(header), XTRA_FORMAT_INVALID);
     header[0] = 0x01;
-    const uint8_t signature[4] = {0x08, 0x0a, 0x00, 0x1a};
-    for (size_t offset = 0; offset < sizeof(signature); ++offset) {
-        header[offset + 2] = static_cast<uint8_t>(signature[offset] ^ 0xff);
-        expectStatus("bad signature", header, sizeof(header), XTRA_FORMAT_INVALID);
-        header[offset + 2] = signature[offset];
+    /* Mirror files regenerated after the retained corpus carry 0x1d at
+       byte 5 where the corpus carries 0x1a. */
+    header[5] = 0x1d;
+    expectStatus("regenerated generation 2", header, sizeof(header),
+                 XTRA_FORMAT_SUPPORTED);
+    for (size_t offset = 2; offset < 6; ++offset) {
+        const uint8_t original = header[offset];
+        header[offset] = static_cast<uint8_t>(original ^ 0xff);
+        expectStatus("unchecked bytes 2-5", header, sizeof(header),
+                     XTRA_FORMAT_SUPPORTED);
+        header[offset] = original;
     }
 }
 
