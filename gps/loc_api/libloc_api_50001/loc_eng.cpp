@@ -1849,9 +1849,8 @@ SIDE EFFECTS
 void loc_eng_cleanup(loc_eng_data_s_type &loc_eng_data)
 {
     ENTRY_LOG_CALLFLOW();
+    loc_eng_xtra_cleanup();
     INIT_CHECK(loc_eng_data.adapter, return);
-
-    // XTRA has no state, so we are fine with it.
 
     // we need to check and clear NI
 #if 0

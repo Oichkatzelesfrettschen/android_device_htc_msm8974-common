@@ -31,12 +31,225 @@
 #define LOG_TAG "LocSvc_eng"
 
 #include <stdint.h>
+#include <pthread.h>
+#include <time.h>
 #include <loc_eng.h>
 #include <MsgTask.h>
+#include <LocTimer.h>
 #include "log_util.h"
 #include "platform_lib_includes.h"
+#include "XtraFormatGuard.h"
+#include "XtraValidityQuery.h"
 
 using namespace loc_core;
+
+static uint64_t xtraRetryClockMs()
+{
+    struct timespec now;
+    clock_gettime(CLOCK_BOOTTIME, &now);
+    return (uint64_t)now.tv_sec * 1000u + (uint64_t)now.tv_nsec / 1000000u;
+}
+
+/* The framework download callback runs on the adapter's MsgTask, the thread
+   loc_eng_init creates through the framework's create_thread_cb, the same
+   thread LocEngRequestXtra uses for the modem's own fresh-orbit request. */
+struct LocEngXtraRetryRequest : public LocMsg {
+    loc_eng_data_s_type* const mLocEng;
+    const unsigned int mEpoch;
+    const unsigned int mRetry;
+    inline LocEngXtraRetryRequest(loc_eng_data_s_type* locEng,
+                                  unsigned int epoch, unsigned int retry) :
+        LocMsg(), mLocEng(locEng), mEpoch(epoch), mRetry(retry)
+    {
+        locallog();
+    }
+    virtual void proc() const;
+    inline void locallog() const {
+        LOC_LOGV("LocEngXtraRetryRequest: retry=%u/3", mRetry);
+    }
+    inline virtual void log() const {
+        locallog();
+    }
+};
+
+class XtraRetryTimer : public LocTimer {
+    /* LocTimerDelegate::expire() clears the timer under its own lock and
+       calls timeOutCallback() after releasing it, so an accepted injection
+       or a reschedule can land between the two. mDueMs identifies the
+       schedule the callback belongs to; a callback that arrives before it
+       belongs to a stopped schedule. */
+    static const uint64_t kExpirySlackMs = 1000;
+    pthread_mutex_t mMutex;
+    pthread_cond_t mCallbackDone;
+    loc_eng_data_s_type* mLocEng;
+    unsigned int mRetriesRequested;
+    bool mScheduled;
+    uint64_t mDueMs;
+    bool mActive;
+    uint64_t mLastRetryMs;
+    bool mCallbackRunning;
+    bool mInjectionRunning;
+    unsigned int mEpoch;
+
+    void retireLocked() {
+        mActive = false;
+        ++mEpoch;
+        mLocEng = NULL;
+        mRetriesRequested = 0;
+        mScheduled = false;
+        stop();
+        while (mCallbackRunning || mInjectionRunning)
+            pthread_cond_wait(&mCallbackDone, &mMutex);
+    }
+
+public:
+    XtraRetryTimer() : mLocEng(NULL), mRetriesRequested(0),
+                       mScheduled(false), mDueMs(0), mActive(false),
+                       mLastRetryMs(0), mCallbackRunning(false),
+                       mInjectionRunning(false), mEpoch(0) {
+        pthread_mutex_init(&mMutex, NULL);
+        pthread_cond_init(&mCallbackDone, NULL);
+    }
+
+    ~XtraRetryTimer() {
+        stop();
+        pthread_cond_destroy(&mCallbackDone);
+        pthread_mutex_destroy(&mMutex);
+    }
+
+    void initialize(loc_eng_data_s_type* locEng) {
+        pthread_mutex_lock(&mMutex);
+        retireLocked();
+        mActive = true;
+        mLocEng = locEng;
+        pthread_mutex_unlock(&mMutex);
+    }
+
+    void cleanup() {
+        pthread_mutex_lock(&mMutex);
+        retireLocked();
+        pthread_mutex_unlock(&mMutex);
+    }
+
+    void recordResult(bool accepted) {
+        static const uint32_t delaysMs[] = {30000, 120000, 600000};
+        pthread_mutex_lock(&mMutex);
+        if (mActive) {
+            if (accepted) {
+                stop();
+                mScheduled = false;
+                mRetriesRequested = 0;
+            } else if (!mScheduled && mLocEng != NULL) {
+                const uint64_t now = xtraRetryClockMs();
+                if (mRetriesRequested == 3 && now - mLastRetryMs >= 3600000u)
+                    mRetriesRequested = 0;
+                if (mRetriesRequested < 3) {
+                    const uint32_t delay = delaysMs[mRetriesRequested];
+                    mScheduled = start(delay, false);
+                    if (mScheduled) {
+                        mDueMs = now + delay;
+                        LOC_LOGI("XTRA retry scheduled: delay_ms=%u retry=%u/3",
+                                 delay, mRetriesRequested + 1);
+                    } else {
+                        LOC_LOGE("XTRA retry timer failed to start");
+                    }
+                }
+            }
+        }
+        pthread_mutex_unlock(&mMutex);
+    }
+
+    unsigned int currentEpoch() {
+        pthread_mutex_lock(&mMutex);
+        const unsigned int epoch = mEpoch;
+        pthread_mutex_unlock(&mMutex);
+        return epoch;
+    }
+
+    bool beginInjection(unsigned int epoch) {
+        pthread_mutex_lock(&mMutex);
+        const bool current = mActive && mEpoch == epoch;
+        if (current)
+            mInjectionRunning = true;
+        pthread_mutex_unlock(&mMutex);
+        return current;
+    }
+
+    void endInjection() {
+        pthread_mutex_lock(&mMutex);
+        mInjectionRunning = false;
+        pthread_cond_broadcast(&mCallbackDone);
+        pthread_mutex_unlock(&mMutex);
+    }
+
+    bool beginRetryCallback(unsigned int epoch) {
+        pthread_mutex_lock(&mMutex);
+        const bool current = mActive && mEpoch == epoch;
+        if (current)
+            mCallbackRunning = true;
+        pthread_mutex_unlock(&mMutex);
+        return current;
+    }
+
+    void endRetryCallback() {
+        pthread_mutex_lock(&mMutex);
+        mCallbackRunning = false;
+        pthread_cond_broadcast(&mCallbackDone);
+        pthread_mutex_unlock(&mMutex);
+    }
+
+    virtual void timeOutCallback() {
+        pthread_mutex_lock(&mMutex);
+        const uint64_t now = xtraRetryClockMs();
+        if (!mScheduled || now + kExpirySlackMs < mDueMs) {
+            /* The container pops its heap top on any expiry, and a stale
+               delegate's stop() can retire the live one, so an early
+               expiry may have consumed the schedule. start() succeeds only
+               when no delegate is live and re-arms the remaining delay. */
+            const bool rearmed = mScheduled && mActive &&
+                    start((uint32_t)(mDueMs - now), false);
+            LOC_LOGI("XTRA retry expiry ignored: scheduled=%d rearmed=%d",
+                     mScheduled, rearmed);
+            pthread_mutex_unlock(&mMutex);
+            return;
+        }
+        mScheduled = false;
+        if (mActive && mLocEng != NULL && mLocEng->adapter != NULL &&
+                mRetriesRequested < 3) {
+            ++mRetriesRequested;
+            mLastRetryMs = now;
+            LOC_LOGI("XTRA retry requesting download: retry=%u/3",
+                     mRetriesRequested);
+            mLocEng->adapter->sendMsg(new LocEngXtraRetryRequest(
+                    mLocEng, mEpoch, mRetriesRequested));
+        }
+        pthread_mutex_unlock(&mMutex);
+    }
+};
+
+static XtraRetryTimer xtraRetryTimer;
+
+void LocEngXtraRetryRequest::proc() const
+{
+    if (!xtraRetryTimer.beginRetryCallback(mEpoch)) {
+        LOC_LOGI("XTRA retry skipped after HAL cleanup: retry=%u/3", mRetry);
+        return;
+    }
+    gps_xtra_download_request callback =
+            mLocEng->xtra_module_data.download_request_cb;
+    if (callback != NULL) {
+        CALLBACK_LOG_CALLFLOW("download_request_cb", %p, mLocEng);
+        callback();
+    } else {
+        LOC_LOGE("XTRA retry has no download callback: retry=%u/3", mRetry);
+    }
+    xtraRetryTimer.endRetryCallback();
+}
+
+void loc_eng_xtra_cleanup()
+{
+    xtraRetryTimer.cleanup();
+}
 
 struct LocEngRequestXtraServer : public LocMsg {
     LocEngAdapter* mAdapter;
@@ -56,15 +269,8 @@ struct LocEngRequestXtraServer : public LocMsg {
     }
 };
 
-/* FNV-1a over the injected buffer. Pins which file actually reached
-   setXtraData(): GnssPsdsDownloader (frameworks/base) load-balances across
-   LONGTERM_PSDS_SERVER_1..3 with a randomized start index and rotates on
-   every download, so two force_psds_injection calls can carry different
-   bytes even though gps.conf's XTRA_SERVER_n (which loc_xtra_init never
-   wires to a callback) stayed fixed. Without a content fingerprint here,
-   a QMI part-count log at the adapter has no way to tell a genuine
-   modem-side rejection from a size difference introduced by server
-   rotation. */
+/* GnssPsdsDownloader rotates mirrors. The fingerprint identifies the exact
+   downloaded payload associated with each QMI injection result. */
 static uint32_t xtra_fnv1a(const char* data, int len)
 {
     uint32_t hash = 0x811c9dc5u;
@@ -79,10 +285,10 @@ struct LocEngInjectXtraData : public LocMsg {
     LocEngAdapter* mAdapter;
     char* mData;
     const int mLen;
-    inline LocEngInjectXtraData(LocEngAdapter* adapter,
-                                char* data, int len):
+    const unsigned int mEpoch;
+    inline LocEngInjectXtraData(LocEngAdapter* adapter, char* data, int len):
         LocMsg(), mAdapter(adapter),
-        mData(new char[len]), mLen(len)
+        mData(new char[len]), mLen(len), mEpoch(xtraRetryTimer.currentEpoch())
     {
         memcpy((void*)mData, (void*)data, len);
         locallog();
@@ -92,23 +298,44 @@ struct LocEngInjectXtraData : public LocMsg {
         delete[] mData;
     }
     inline virtual void proc() const {
-        /* expected_parts mirrors LocApiV02::setXtraData's own
-           ((length - 1) / QMI_LOC_MAX_PREDICTED_ORBITS_PART_LEN_V02) + 1
-           (location_service_v02.h; the part length ceiling is 1024 bytes)
-           so a part-count mismatch between this log and the adapter's own
-           QMI_LOC_INJECT_PREDICTED_ORBITS_DATA_REQ log names a length
-           change between dispatch and the adapter call, not a modem
-           artifact. */
-        LOC_LOGI("setXtraData dispatch: length=%d fnv1a=0x%08x "
+        if (!xtraRetryTimer.beginInjection(mEpoch)) {
+            /* Queued before a cleanup: inject as the stock HAL does and
+               leave the retired retry state alone. */
+            mAdapter->setXtraData(mData, mLen);
+            LOC_LOGI("XTRA injection after HAL cleanup: no retry bookkeeping");
+            return;
+        }
+        const XtraValidity before = queryXtraValidity();
+        LOC_LOGI("XTRA QMI dispatch: length=%d fnv1a=0x%08x "
                  "magic=%02x%02x expected_parts=%d",
                  mLen, xtra_fnv1a(mData, mLen),
                  mLen > 0 ? (uint8_t)mData[0] : 0,
                  mLen > 1 ? (uint8_t)mData[1] : 0,
                  mLen > 0 ? ((mLen - 1) / 1024) + 1 : 0);
-        mAdapter->setXtraData(mData, mLen);
+        /* setXtraData() reports transport success even when the modem
+           rejects the assembled file, so the engine's validity window
+           decides acceptance. */
+        const int adapterStatus = mAdapter->setXtraData(mData, mLen);
+        const XtraValidity after = queryXtraValidity();
+        const uint64_t now = (uint64_t)time(NULL);
+        const bool current = xtraValidityCurrent(after, now);
+        const bool loaded = current &&
+                (!before.known || before.startUtc != after.startUtc ||
+                 before.durationHours != after.durationHours);
+        LOC_LOGI("XTRA QMI result: accepted=%d loaded=%d adapter=%d "
+                 "validity=%llu+%uh before=%llu+%uh query_client=%d query_modem=%d",
+                 current, loaded, adapterStatus,
+                 (unsigned long long)after.startUtc, after.durationHours,
+                 (unsigned long long)before.startUtc, before.durationHours,
+                 after.clientStatus, after.modemStatus);
+        /* An unanswered query says nothing about the file, so it leaves
+           the retry state unchanged. */
+        if (after.answered)
+            xtraRetryTimer.recordResult(current);
+        xtraRetryTimer.endInjection();
     }
     inline  void locallog() const {
-        LOC_LOGI("setXtraData queued: length=%d fnv1a=0x%08x data=%p",
+        LOC_LOGI("XTRA injection queued: length=%d fnv1a=0x%08x data=%p",
                  mLen, xtra_fnv1a(mData, mLen), mData);
     }
     inline virtual void log() const {
@@ -161,6 +388,9 @@ int loc_eng_xtra_init (loc_eng_data_s_type &loc_eng_data,
     if(callbacks == NULL) {
         LOC_LOGE("loc_eng_xtra_init: failed, cb is NULL");
     } else {
+        /* initialize() waits out a retry callback still reading the old
+           download_request_cb before the new one is written. */
+        xtraRetryTimer.initialize(&loc_eng_data);
         xtra_module_data_ptr = &loc_eng_data.xtra_module_data;
         xtra_module_data_ptr->download_request_cb = callbacks->download_request_cb;
         xtra_module_data_ptr->report_xtra_server_cb = callbacks->report_xtra_server_cb;
@@ -191,6 +421,14 @@ int loc_eng_xtra_inject_data(loc_eng_data_s_type &loc_eng_data,
                              char* data, int length)
 {
     ENTRY_LOG();
+    const XtraFormatStatus format =
+            classifyXtraFormat(data, length > 0 ? length : 0);
+    if (format != XTRA_FORMAT_SUPPORTED) {
+        LOC_LOGE("XTRA injection refused: format=%d length=%d", format, length);
+        xtraRetryTimer.recordResult(false);
+        EXIT_LOG(%d, -1);
+        return -1;
+    }
     LocEngAdapter* adapter = loc_eng_data.adapter;
     adapter->sendMsg(new LocEngInjectXtraData(adapter, data, length));
     EXIT_LOG(%d, 0);
