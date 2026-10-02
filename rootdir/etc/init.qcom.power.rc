@@ -137,11 +137,6 @@ on property:dev.bootcomplete=1
     # Set perfd properties
     setprop ro.qualcomm.perf.cores_online 2
 
-on property:dev.bootcomplete=1 && property:sys.htc.vendor_data.perfd.ready=1 && property:sys.htc.vendor_data.perfd_socket.ready=1
-    # Start after both compatibility paths have been prepared successfully.
-    rm /data/vendor/perfd/default_values
-    start mpdecision
-
 service mpdecision /vendor/bin/mpdecision --avg_comp
     class main
     user root

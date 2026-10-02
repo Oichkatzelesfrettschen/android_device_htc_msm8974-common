@@ -64,3 +64,9 @@ on property:sys.htc.vendor_data.boot_ready=1 && property:sys.htc.vendor_data.loc
 # Preserve the core service boot gate while requiring prepared diagnostic data.
 on property:sys.htc.vendor_data.boot_ready=1 && property:sys.htc.vendor_data.netmgr.ready=1
     start netmgrd
+
+# The readiness properties are system-internal, so this trigger lives in a
+# system init file; vendor_init cannot read them.
+on property:dev.bootcomplete=1 && property:sys.htc.vendor_data.perfd.ready=1 && property:sys.htc.vendor_data.perfd_socket.ready=1
+    rm /data/vendor/perfd/default_values
+    start mpdecision
