@@ -39,7 +39,7 @@
 #include "log_util.h"
 #include "platform_lib_includes.h"
 #include "XtraFormatGuard.h"
-#include "XtraQmiInjector.h"
+#include "XtraValidityQuery.h"
 
 using namespace loc_core;
 
@@ -275,11 +275,12 @@ static uint32_t xtra_fnv1a(const char* data, int len)
 }
 
 struct LocEngInjectXtraData : public LocMsg {
+    LocEngAdapter* mAdapter;
     char* mData;
     const int mLen;
     const unsigned int mEpoch;
-    inline LocEngInjectXtraData(char* data, int len):
-        LocMsg(),
+    inline LocEngInjectXtraData(LocEngAdapter* adapter, char* data, int len):
+        LocMsg(), mAdapter(adapter),
         mData(new char[len]), mLen(len), mEpoch(xtraRetryTimer.currentEpoch())
     {
         memcpy((void*)mData, (void*)data, len);
@@ -294,20 +295,30 @@ struct LocEngInjectXtraData : public LocMsg {
             LOC_LOGI("XTRA injection skipped after HAL cleanup");
             return;
         }
-        /* Each part is limited to 1024 bytes by location_service_v02.h. */
+        const XtraValidity before = queryXtraValidity();
         LOC_LOGI("XTRA QMI dispatch: length=%d fnv1a=0x%08x "
                  "magic=%02x%02x expected_parts=%d",
                  mLen, xtra_fnv1a(mData, mLen),
                  mLen > 0 ? (uint8_t)mData[0] : 0,
                  mLen > 1 ? (uint8_t)mData[1] : 0,
                  mLen > 0 ? ((mLen - 1) / 1024) + 1 : 0);
-        /* The prebuilt adapter reports QMI transport success even when the
-           modem rejects the assembled file. Read each modem indication. */
-        const XtraInjectionResult result = injectXtraWithModemStatus(mData, mLen);
-        LOC_LOGI("XTRA QMI result: accepted=%d client=%d modem=%d part=%u",
-                 result.accepted, result.clientStatus, result.modemStatus,
-                 result.partNumber);
-        xtraRetryTimer.recordResult(result.accepted);
+        /* setXtraData() reports transport success even when the modem
+           rejects the assembled file, so the engine's validity window
+           decides acceptance. */
+        const int adapterStatus = mAdapter->setXtraData(mData, mLen);
+        const XtraValidity after = queryXtraValidity();
+        const uint64_t now = (uint64_t)time(NULL);
+        const bool current = xtraValidityCurrent(after, now);
+        const bool loaded = current &&
+                (!before.known || before.startUtc != after.startUtc ||
+                 before.durationHours != after.durationHours);
+        LOC_LOGI("XTRA QMI result: accepted=%d loaded=%d adapter=%d "
+                 "validity=%llu+%uh before=%llu+%uh query_client=%d query_modem=%d",
+                 current, loaded, adapterStatus,
+                 (unsigned long long)after.startUtc, after.durationHours,
+                 (unsigned long long)before.startUtc, before.durationHours,
+                 after.clientStatus, after.modemStatus);
+        xtraRetryTimer.recordResult(current);
         xtraRetryTimer.endInjection();
     }
     inline  void locallog() const {
@@ -404,7 +415,7 @@ int loc_eng_xtra_inject_data(loc_eng_data_s_type &loc_eng_data,
         return -1;
     }
     LocEngAdapter* adapter = loc_eng_data.adapter;
-    adapter->sendMsg(new LocEngInjectXtraData(data, length));
+    adapter->sendMsg(new LocEngInjectXtraData(adapter, data, length));
     EXIT_LOG(%d, 0);
     return 0;
 }

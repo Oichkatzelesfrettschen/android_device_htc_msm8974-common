@@ -1,11 +1,13 @@
 #ifndef FAKE_LOC_API_H
 #define FAKE_LOC_API_H
 
+#include <stdint.h>
+
 enum FakeScenario {
-    FAKE_SUCCESS,
-    FAKE_REJECT_FINAL,
-    FAKE_TRANSPORT_FAILURE,
-    FAKE_PART_MISMATCH
+    FAKE_WINDOW,
+    FAKE_NO_WINDOW,
+    FAKE_MODEM_FAILURE,
+    FAKE_TRANSPORT_FAILURE
 };
 
 struct FakeObservations {
@@ -16,8 +18,8 @@ struct FakeObservations {
     unsigned int callbacks;
 };
 
-extern "C" void fakeLocReset(FakeScenario scenario, const char* payload,
-                              unsigned int length);
+extern "C" void fakeLocReset(FakeScenario scenario, uint64_t startUtc,
+                              uint16_t durationHours);
 extern "C" FakeObservations fakeLocObservations();
 
 #endif

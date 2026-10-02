@@ -1,12 +1,10 @@
 #define LOG_TAG "LocSvc_eng"
 
-#include "XtraQmiInjector.h"
+#include "XtraValidityQuery.h"
 
 #include <dlfcn.h>
-#include <limits.h>
 #include <pthread.h>
 #include <stdint.h>
-#include <string.h>
 
 #include <log/log.h>
 
@@ -73,8 +71,8 @@ void responseCallback(locClientHandleType handle, uint32_t responseId,
 {
     gClientFunctions.processIndication(
             handle, responseId,
-            const_cast<qmiLocInjectPredictedOrbitsDataIndMsgT_v02*>(
-                    response.pInjectPredictedOrbitsDataInd));
+            const_cast<qmiLocGetPredictedOrbitsDataValidityIndMsgT_v02*>(
+                    response.pGetPredictedOrbitsDataValidityInd));
 }
 
 void eventCallback(locClientHandleType, uint32_t,
@@ -89,14 +87,14 @@ void errorCallback(locClientHandleType, locClientErrorEnumType error, void*)
 
 }  // namespace
 
-XtraInjectionResult injectXtraWithModemStatus(const char* data, int length)
+/* GET_PREDICTED_ORBITS_DATA_VALIDITY reads the window the engine holds and
+   carries no payload, so a second client reads it without touching the
+   production client's injection. Data injected through a second client is
+   acknowledged part by part yet never reaches this window, so injection
+   stays on the production client. */
+XtraValidity queryXtraValidity()
 {
-    XtraInjectionResult result = {false, -1, -1, 0};
-    if (data == nullptr || length <= 0 ||
-        length > static_cast<int>(UINT16_MAX *
-                                  QMI_LOC_MAX_PREDICTED_ORBITS_PART_LEN_V02))
-        return result;
-
+    XtraValidity result = {false, -1, -1, 0, 0};
     pthread_once(&gClientInitOnce, initializeClientFunctions);
     if (!gClientFunctions.ready)
         return result;
@@ -115,52 +113,32 @@ XtraInjectionResult injectXtraWithModemStatus(const char* data, int length)
             handle == LOC_CLIENT_INVALID_HANDLE_VALUE)
         return result;
 
-    const unsigned int partSize = QMI_LOC_MAX_PREDICTED_ORBITS_PART_LEN_V02;
-    const unsigned int totalParts =
-            (static_cast<unsigned int>(length) + partSize - 1) / partSize;
-    qmiLocInjectPredictedOrbitsDataReqMsgT_v02 request = {};
-    request.totalSize = length;
-    request.totalParts = totalParts;
-    request.formatType_valid = 1;
-    request.formatType = eQMI_LOC_PREDICTED_ORBITS_XTRA_V02;
-
     locClientReqUnionType requestUnion = {};
-    requestUnion.pInjectPredictedOrbitsDataReq = &request;
-
-    for (unsigned int part = 1; part <= totalParts; ++part) {
-        const unsigned int offset = (part - 1) * partSize;
-        const unsigned int remaining = static_cast<unsigned int>(length) - offset;
-        request.partNum = part;
-        request.partData_len = remaining < partSize ? remaining : partSize;
-        memcpy(request.partData, data + offset, request.partData_len);
-
-        qmiLocInjectPredictedOrbitsDataIndMsgT_v02 indication = {};
-        clientStatus = gClientFunctions.sendRequest(
-                handle, QMI_LOC_INJECT_PREDICTED_ORBITS_DATA_REQ_V02,
-                requestUnion, kRequestTimeoutMs,
-                QMI_LOC_INJECT_PREDICTED_ORBITS_DATA_IND_V02, &indication);
-        result.clientStatus = clientStatus;
-        result.partNumber = part;
-        if (clientStatus != eLOC_CLIENT_SUCCESS) {
-            /* No indication arrived for this part, so its modem status is
-               unknown rather than the previous part's result. */
-            result.modemStatus = -1;
-            ALOGE("XTRA QMI injection transport failure: part=%u/%u client=%d",
-                  part, totalParts, clientStatus);
-            break;
-        }
+    qmiLocGetPredictedOrbitsDataValidityIndMsgT_v02 indication = {};
+    clientStatus = gClientFunctions.sendRequest(
+            handle, QMI_LOC_GET_PREDICTED_ORBITS_DATA_VALIDITY_REQ_V02,
+            requestUnion, kRequestTimeoutMs,
+            QMI_LOC_GET_PREDICTED_ORBITS_DATA_VALIDITY_IND_V02, &indication);
+    result.clientStatus = clientStatus;
+    if (clientStatus == eLOC_CLIENT_SUCCESS) {
         result.modemStatus = indication.status;
-        if (indication.status != eQMI_LOC_SUCCESS_V02 ||
-                (indication.partNum_valid && indication.partNum != part)) {
-            ALOGE("XTRA QMI injection rejected: part=%u/%u client=%d modem=%d indication_part=%u",
-                  part, totalParts, clientStatus, indication.status,
-                  indication.partNum);
-            break;
+        if (indication.status == eQMI_LOC_SUCCESS_V02 &&
+                indication.validityInfo_valid) {
+            result.known = true;
+            result.startUtc = indication.validityInfo.startTimeInUTC;
+            result.durationHours = indication.validityInfo.durationHours;
         }
-        if (part == totalParts)
-            result.accepted = true;
+    } else {
+        ALOGE("XTRA validity query transport failure: client=%d", clientStatus);
     }
 
     gClientFunctions.close(&handle);
     return result;
+}
+
+bool xtraValidityCurrent(const XtraValidity& validity, uint64_t nowUtc)
+{
+    return validity.known && nowUtc >= validity.startUtc &&
+            nowUtc - validity.startUtc <
+                    static_cast<uint64_t>(validity.durationHours) * 3600u;
 }
