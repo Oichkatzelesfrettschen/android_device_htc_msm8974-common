@@ -149,10 +149,10 @@
     <bool name="config_enableWifiDisplay">true</bool>
 
     <!-- GnssPsdsDownloader fetches predicted orbits only from LONGTERM_PSDS_SERVER_1..3.
-         GnssLocationProvider builds a new downloader for every HAL download request,
-         and each one starts at a random server and moves on only past a failed HTTP
-         fetch, so every XTRA retry draws its server at random from this list. The
-         XTRA_SERVER_* keys in gps.conf feed the HAL's report_xtra_server_cb, which
+         GnssLocationProvider keeps one downloader per server list; it starts at a
+         random server and advances after every download, so an XTRA retry after a
+         rejected file fetches from the next server in this list. The XTRA_SERVER_*
+         keys in gps.conf feed the HAL's report_xtra_server_cb, which
          IGnssXtraCallback 1.0 does not carry.
          The MSM8974 modem's setXtraData loads XTRA2 (header byte 1 = 0x34) and XTRA3
          (0x32) files alike, and libloc_eng accepts a file by the validity window it
