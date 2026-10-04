@@ -60,6 +60,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
     debug.egl.hw=1 \
     debug.hwui.renderer=opengl \
     debug.hwui.use_buffer_age=false \
+    debug.hwui.use_partial_updates=false \
     debug.mdpcomp.logs=0 \
     debug.sf.disable_backpressure=1 \
     debug.sf.hw=1 \
