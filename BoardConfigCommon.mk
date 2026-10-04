@@ -68,10 +68,28 @@ BOARD_MKBOOTIMG_ARGS := --kernel_offset 0x00008000 --ramdisk_offset 0x02008000 -
 BOARD_RAMDISK_USE_XZ := true
 XZ := prebuilts/build-tools/$(HOST_PREBUILT_TAG)/bin/xz
 TARGET_KERNEL_SOURCE := kernel/htc/msm8974
+TARGET_KERNEL_NO_GCC := false
+# M8_KERNEL_CLANG_THINLTO=true builds the kernel with the Clang that
+# LLVM_PREBUILTS_VERSION names, LLVM binutils and the integrated assembler,
+# links it with ThinLTO, and makes every compile, assemble and link warning
+# fatal: KCFLAGS and KAFLAGS carry -Werror and --fatal-warnings, an empty
+# AFLAGS_NOWARN removes arch/arm/Makefile's -Wa,-W, and the kernel's ThinLTO
+# cache stays off because a cache hit skips the codegen that reports
+# inline-asm diagnostics. The GCC build is the default.
+ifeq ($(M8_KERNEL_CLANG_THINLTO),true)
+TARGET_KERNEL_CLANG_COMPILE := true
+TARGET_KERNEL_LLVM_BINUTILS := true
+TARGET_KERNEL_CLANG_VERSION := $(patsubst clang-%,%,$(LLVM_PREBUILTS_VERSION))
+KERNEL_LTO := thin
+TARGET_KERNEL_ADDITIONAL_FLAGS := HOSTCFLAGS="-fcommon" HOSTLDFLAGS="-fuse-ld=lld" \
+    KCFLAGS="-Werror -ferror-limit=0 -Wa,--fatal-warnings" \
+    KAFLAGS="-Wa,--fatal-warnings" AFLAGS_NOWARN= \
+    LD="ld.lld --fatal-warnings --error-limit=0"
+else
 TARGET_KERNEL_CLANG_COMPILE := false
 TARGET_KERNEL_LLVM_BINUTILS := false
-TARGET_KERNEL_NO_GCC := false
 TARGET_KERNEL_ADDITIONAL_FLAGS := HOSTCFLAGS="-fcommon" HOSTLDFLAGS="-fuse-ld=lld"
+endif
 
 BUILD_BROKEN_USES_BUILD_COPY_HEADERS := true
 BUILD_BROKEN_ELF_PREBUILT_PRODUCT_COPY_FILES := true
