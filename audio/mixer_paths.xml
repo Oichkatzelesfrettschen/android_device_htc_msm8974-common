@@ -1042,12 +1042,19 @@
     </path>
 
     <path name="bt-sco-headset">
+        <ctl name="Internal BTSCO SampleRate" value="BTSCO_RATE_8KHZ" />
     </path>
 
     <path name="bt-sco-headset-wb">
+        <ctl name="Internal BTSCO SampleRate" value="BTSCO_RATE_16KHZ" />
+    </path>
+
+    <path name="bt-sco-mic-wb">
+        <ctl name="Internal BTSCO SampleRate" value="BTSCO_RATE_16KHZ" />
     </path>
 
     <path name="bt-sco-mic">
+        <ctl name="Internal BTSCO SampleRate" value="BTSCO_RATE_8KHZ" />
     </path>
 
     <path name="capture-fm">
