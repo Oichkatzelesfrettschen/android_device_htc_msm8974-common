@@ -45,7 +45,9 @@ TARGET_ARCH := arm
 TARGET_ARCH_VARIANT := armv7-a-neon
 TARGET_CPU_ABI := armeabi-v7a
 TARGET_CPU_ABI2 := armeabi
-TARGET_CPU_VARIANT := generic
+# M8_KRAIT_CPU_VARIANT=true selects Soong's krait variant (-mcpu=krait
+# -mfpu=neon-vfpv4) for the Clang 22 lane; every other build stays generic.
+TARGET_CPU_VARIANT := $(if $(filter true,$(M8_KRAIT_CPU_VARIANT)),krait,generic)
 TARGET_CPU_VARIANT_RUNTIME := krait
 
 # Kernel
