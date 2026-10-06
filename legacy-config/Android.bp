@@ -1,4 +1,10 @@
 // Preserve paths compiled into legacy consumers; contents remain vendor-owned.
+// The links live in their own namespace, which only products listing
+// device/htc/msm8974-common/legacy-config export, so another product in the
+// same tree can own these /system/etc paths.
+
+soong_namespace {
+}
 
 install_symlink {
     name: "htc_gnss_config_link_flp_conf",

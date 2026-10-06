@@ -135,6 +135,7 @@ PRODUCT_PACKAGES += \
     libbt-vendor
 
 PRODUCT_SOONG_NAMESPACES += \
+    device/htc/msm8974-common/legacy-config \
     hardware/qcom-caf/bt/libbt-vendor \
     hardware/google/pixel \
     hardware/google/interfaces
